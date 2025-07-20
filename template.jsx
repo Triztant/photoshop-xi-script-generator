@@ -1,5 +1,6 @@
 // Injected player name list as an array
-ç
+// This placeholder will be replaced by the web app with a JSON array of names
+var playerNames = {{PLAYER_NAMES}};
 // This placeholder will be replaced by the web app with a JSON array of names
 // Hide a layer by name
 function hideLayer(layerName) {
@@ -136,3 +137,4 @@ function replaceSmartObjectContents(layerName, imagePath) {
 
 
 {{REPLACEMENTS}}
+
