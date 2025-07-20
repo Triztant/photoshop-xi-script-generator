@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Squad → Photoshop XI Script</title>
+  <style>
+    body { font-family: sans-serif; padding: 1rem; }
+    label { display: block; margin: 0.5rem 0; }
+    input { width: 300px; padding: 0.3rem; }
+    button { margin-top: 1rem; padding: 0.5rem 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Pick Your 11</h1>
+  <form id="squadForm">
+    <div id="inputs"></div>
+    <datalist id="namesList"></datalist>
+    <button type="submit">Generate &amp; Download .jsx</button>
+  </form>
+
+  <script src="script.js"></script>
+</body>
+</html>
