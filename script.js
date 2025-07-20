@@ -40,10 +40,10 @@ document.getElementById('squadForm').addEventListener('submit', e => {
     return alert('Please pick exactly 11 players.');
   }
 
-  // Build the REPLACEMENTS blocks
+  // Build the REPLACEMENTS blocks, now pointing into PLAYER PF/
   const blocks = players.map(nm => {
     const fileBase = nm.replace(/ /g, '_');
-    return `replaceSmartObjectContents("${fileBase}", "${fileBase}.png");`;
+    return `replaceSmartObjectContents("${fileBase}", "PLAYER PF/${fileBase}.png");`;
   });
 
   // Inject into template
