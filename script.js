@@ -40,10 +40,14 @@ document.getElementById('squadForm').addEventListener('submit', e => {
     return alert('Please pick exactly 11 players.');
   }
 
-  // Build the IMAGE_FILES array literal
+  // Build the IMAGE_FILES array literal using hyphens
   const imageFilesArray = '[' +
     players
-      .map(nm => `"${nm.replace(/ /g, '_')}.png"`)
+      .map(nm => {
+        // turn spaces into hyphens and lowercase
+        const fileName = nm.trim().toLowerCase().replace(/\s+/g, '-');
+        return `"${fileName}.png"`;
+      })
       .join(',') +
     ']';
 
