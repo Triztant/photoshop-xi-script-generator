@@ -40,19 +40,16 @@ document.getElementById('squadForm').addEventListener('submit', e => {
     return alert('Please pick exactly 11 players.');
   }
 
-  // Build the REPLACEMENTS blocks, now pointing into PLAYER PF/
-  const blocks = players.map(nm => {
-    const fileBase = nm.replace(/ /g, '_');
-    return `replaceSmartObjectContents("${fileBase}", "PLAYER PF/${fileBase}.png");`;
-  });
+  // Build the IMAGE_FILES array literal
+  const imageFilesArray = '[' +
+    players
+      .map(nm => `"${nm.replace(/ /g, '_')}.png"`)
+      .join(',') +
+    ']';
 
   // Inject into template
   let js = template
-    .replace('{{REPLACEMENTS}}', blocks.join('\n'))
-    .replace(
-      '{{PLAYER_NAMES}}',
-      '[' + players.map(n => `"${n}"`).join(',') + ']'
-    );
+    .replace('{{IMAGE_FILES}}', imageFilesArray);
 
   // Trigger download
   const blob = new Blob([js], { type: 'application/javascript' });
