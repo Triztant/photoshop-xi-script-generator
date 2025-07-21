@@ -4,11 +4,12 @@ var desktop = Folder('~/Desktop');
 // List of layer names (positions)
 var positions = ["GK", "LB", "LCB", "RCB", "RB", "RCM", "LCM", "CM", "LW", "ST", "RW"];
 
-var imageFiles = {{IMAGE_FILES}}; // Placeholder for array of filenames
+// Dynamically injected list of image filenames (must match positions order)
+var imageFiles = {{IMAGE_FILES}}; // e.g. ["ryan_gravenberch.png", "lionel_messi.png", …]
 
 // Get last name from image file name ("nathan-ake.png" → "ake")
 function getLastName(file) {
-    var nameOnly = file.name.replace(/\.[^\.]+$/, ""); // Remove extension
+    var nameOnly = file.name.replace(/\.[^\.]+$/, "");
     var parts = nameOnly.split("-");
     return parts.length > 1 ? parts[parts.length - 1] : nameOnly;
 }
@@ -21,7 +22,7 @@ var doc = app.activeDocument;
 
 for (var p = 0; p < positions.length; p++) {
     var posName = positions[p];
-    var baseName = posName + "_base"; // Ensure your base layers are named like "GK_base", "LB_base", etc.
+    var baseName = posName + "_base";
 
     var imageName = imageFiles[p];
     var inputFile = new File(desktop + '/PLAYER PF/' + imageName);
@@ -33,7 +34,7 @@ for (var p = 0; p < positions.length; p++) {
 
     var lastName = getLastName(inputFile);
 
-    // Find the layer with this position name
+    // Find the target layer
     var targetLayer = null;
     for (var i = 0; i < doc.layers.length; i++) {
         if (doc.layers[i].name == posName) {
@@ -46,7 +47,7 @@ for (var p = 0; p < positions.length; p++) {
         continue;
     }
 
-    // Save bounds for resizing/moving
+    // Save original bounds
     var bounds = targetLayer.bounds;
     var origLeft = bounds[0].as('px');
     var origTop = bounds[1].as('px');
@@ -55,10 +56,10 @@ for (var p = 0; p < positions.length; p++) {
     var origWidth = origRight - origLeft;
     var origHeight = origBottom - origTop;
 
-    // Delete the old image layer
+    // Remove the old image layer
     targetLayer.remove();
 
-    // Find base (clipping) layer by name
+    // Find base layer
     var baseLayer = null;
     for (var j = 0; j < doc.layers.length; j++) {
         if (doc.layers[j].name == baseName) {
@@ -71,45 +72,36 @@ for (var p = 0; p < positions.length; p++) {
         continue;
     }
 
-    // Open and copy the new image
+    // Open and copy new image
     var newImgDoc = app.open(inputFile);
     newImgDoc.selection.selectAll();
     newImgDoc.selection.copy();
     newImgDoc.close(SaveOptions.DONOTSAVECHANGES);
 
-    // Paste new image
+    // Paste and name
     doc.paste();
     var newLayer = doc.activeLayer;
     newLayer.name = posName;
-
-    // Move above the base layer
     newLayer.move(baseLayer, ElementPlacement.PLACEBEFORE);
 
-    // Resize and move to match original bounds
+    // Resize proportionally
     var newBounds = newLayer.bounds;
-    var newLeft = newBounds[0].as('px');
-    var newTop = newBounds[1].as('px');
-    var newRight = newBounds[2].as('px');
-    var newBottom = newBounds[3].as('px');
-    var newWidth = newRight - newLeft;
-    var newHeight = newBottom - newTop;
-
-    // Proportional scaling to fit within original bounds
+    var newWidth = newBounds[2].as('px') - newBounds[0].as('px');
+    var newHeight = newBounds[3].as('px') - newBounds[1].as('px');
     var scaleRatio = Math.min(origWidth / newWidth, origHeight / newHeight) * 100;
     newLayer.resize(scaleRatio, scaleRatio, AnchorPosition.TOPLEFT);
 
-    // After resizing, get bounds again for correct position
+    // Reposition
     var resizedBounds = newLayer.bounds;
     var resizedLeft = resizedBounds[0].as('px');
     var resizedTop = resizedBounds[1].as('px');
-
     newLayer.translate(origLeft - resizedLeft, origTop - resizedTop);
 
-    // Re-apply clipping mask to the base layer
+    // Apply clipping mask
     newLayer.grouped = true;
 
-    // --- UPDATE THE TEXT LAYER ---
-    var textName = posName + "_text"; // Text layer
+    // Update text layer
+    var textName = posName + "_text";
     var textLayer = null;
     for (var t = 0; t < doc.layers.length; t++) {
         if (doc.layers[t].name == textName) {
@@ -122,4 +114,4 @@ for (var p = 0; p < positions.length; p++) {
     }
 }
 
-alert("All 11 positions have been swapped and clipped to their named base layers!");
+alert("All 11 positions have been updated!");
