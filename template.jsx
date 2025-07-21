@@ -1,19 +1,10 @@
+// Web-generated Photoshop XI Script using layer-based replacement
 var desktop = Folder('~/Desktop');
 
-// Injected player name list as an array
-var playerNames = [
-    "nick-pope",
-    "murillo-santiago-costa-dos-santos",
-    "nathan-tella",
-    "nemanja-matic",
-    "nicholas-williams-arthuer",
-    "nicolas-jackson",
-    "oliver-johansen-braude",
-    "ollie-watkins",
-    "ousmane-dembele",
-    "pablo-martin-paez-gavira",
-    "nicolas-alejandro-tagliafico"
-];
+// List of layer names (positions)
+var positions = ["GK", "LB", "LCB", "RCB", "RB", "RCM", "LCM", "CM", "LW", "ST", "RW"];
+
+var imageFiles = {{IMAGE_FILES}}; // Placeholder for array of filenames
 
 // Get last name from image file name ("nathan-ake.png" → "ake")
 function getLastName(file) {
@@ -28,14 +19,16 @@ if (app.documents.length == 0) {
 }
 var doc = app.activeDocument;
 
-function replaceSmartObjectContents(position, playerName) {
-    var baseName = position + "_base"; // Ensure your base layers are named like "GK_base", "LB_base", etc.
-    var imageName = playerName + ".png";
+for (var p = 0; p < positions.length; p++) {
+    var posName = positions[p];
+    var baseName = posName + "_base"; // Ensure your base layers are named like "GK_base", "LB_base", etc.
+
+    var imageName = imageFiles[p];
     var inputFile = new File(desktop + '/PLAYER PF/' + imageName);
 
     if (!inputFile.exists) {
         alert("Could not find '" + imageName + "' in 'PLAYER PF' on your Desktop.");
-        return;
+        continue;
     }
 
     var lastName = getLastName(inputFile);
@@ -43,14 +36,14 @@ function replaceSmartObjectContents(position, playerName) {
     // Find the layer with this position name
     var targetLayer = null;
     for (var i = 0; i < doc.layers.length; i++) {
-        if (doc.layers[i].name == position) {
+        if (doc.layers[i].name == posName) {
             targetLayer = doc.layers[i];
             break;
         }
     }
     if (!targetLayer) {
-        alert('Could not find layer named "' + position + '"');
-        return;
+        alert('Could not find layer named "' + posName + '"');
+        continue;
     }
 
     // Save bounds for resizing/moving
@@ -75,7 +68,7 @@ function replaceSmartObjectContents(position, playerName) {
     }
     if (!baseLayer) {
         alert('Could not find base layer named "' + baseName + '"');
-        return;
+        continue;
     }
 
     // Open and copy the new image
@@ -87,7 +80,7 @@ function replaceSmartObjectContents(position, playerName) {
     // Paste new image
     doc.paste();
     var newLayer = doc.activeLayer;
-    newLayer.name = position;
+    newLayer.name = posName;
 
     // Move above the base layer
     newLayer.move(baseLayer, ElementPlacement.PLACEBEFORE);
@@ -116,7 +109,7 @@ function replaceSmartObjectContents(position, playerName) {
     newLayer.grouped = true;
 
     // --- UPDATE THE TEXT LAYER ---
-    var textName = position + "_text"; // Text layer
+    var textName = posName + "_text"; // Text layer
     var textLayer = null;
     for (var t = 0; t < doc.layers.length; t++) {
         if (doc.layers[t].name == textName) {
@@ -127,12 +120,6 @@ function replaceSmartObjectContents(position, playerName) {
     if (textLayer && textLayer.kind == LayerKind.TEXT) {
         textLayer.textItem.contents = lastName;
     }
-}
-
-// Process each player by mapping to its layer
-var positions = ["GK","LB","LCB","RCB","RB","RCM","LCM","CM","LW","ST","RW"];
-for (var i = 0; i < positions.length; i++) {
-    replaceSmartObjectContents(positions[i], playerNames[i]);
 }
 
 alert("All 11 positions have been swapped and clipped to their named base layers!");
