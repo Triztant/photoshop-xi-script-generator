@@ -47,9 +47,11 @@ document.getElementById('squadForm').addEventListener('submit', e => {
       .join(',') +
     ']';
 
+  // Regex to match {{IMAGE_FILES}} with optional whitespace
+  const placeholderRE = /{{\s*IMAGE_FILES\s*}}/;
+
   // Inject into template
-  let js = template
-    .replace('{{IMAGE_FILES}}', imageFilesArray);
+  let js = template.replace(placeholderRE, imageFilesArray);
 
   // Trigger download
   const blob = new Blob([js], { type: 'application/javascript' });
