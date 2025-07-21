@@ -5,7 +5,7 @@ var desktop = Folder('~/Desktop');
 var positions = ["GK", "LB", "LCB", "RCB", "RB", "RCM", "LCM", "CM", "LW", "ST", "RW"];
 
 // Dynamically injected list of image filenames (must match positions order)
-var imageFiles = {{IMAGE_FILES}}; // e.g. ["ryan_gravenberch.png", "lionel_messi.png", …]
+var imageFiles = {{IMAGE_FILES}}; // e.g. ["declan-rice.png", "lionel-messi.png", …]
 
 // Get last name from image file name ("nathan-ake.png" → "ake")
 function getLastName(file) {
