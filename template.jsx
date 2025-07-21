@@ -1,140 +1,138 @@
+var desktop = Folder('~/Desktop');
+
 // Injected player name list as an array
-// This placeholder will be replaced by the web app with a JSON array of names
-var playerNames = {{PLAYER_NAMES}};
-// This placeholder will be replaced by the web app with a JSON array of names
-// Hide a layer by name
-function hideLayer(layerName) {
-    try {
-        var layer = app.activeDocument.layers.getByName(layerName);
-        layer.visible = false;
-    } catch (e) {
-        // ignore if layer not found
-    }
-}
-function findLayerByName(layerSet, name) {
-    for (var i = 0; i < layerSet.layers.length; i++) {
-        var layer = layerSet.layers[i];
-        if (layer.name === name) {
-            return layer;
-        } else if (layer.typename === "LayerSet") {
-            var found = findLayerByName(layer, name);
-            if (found) return found;
-        }
-    }
-    return null;
+var playerNames = [
+    "nick-pope",
+    "murillo-santiago-costa-dos-santos",
+    "nathan-tella",
+    "nemanja-matic",
+    "nicholas-williams-arthuer",
+    "nicolas-jackson",
+    "oliver-johansen-braude",
+    "ollie-watkins",
+    "ousmane-dembele",
+    "pablo-martin-paez-gavira",
+    "nicolas-alejandro-tagliafico"
+];
+
+// Get last name from image file name ("nathan-ake.png" → "ake")
+function getLastName(file) {
+    var nameOnly = file.name.replace(/\.[^\.]+$/, ""); // Remove extension
+    var parts = nameOnly.split("-");
+    return parts.length > 1 ? parts[parts.length - 1] : nameOnly;
 }
 
-function replaceSmartObjectContents(layerName, imagePath) {
-    var doc = app.activeDocument;
+if (app.documents.length == 0) {
+    alert("Open your template PSD first!");
+    throw "No document open.";
+}
+var doc = app.activeDocument;
 
-    // Update text layer in the main document
-    var textLayer = findLayerByName(doc, layerName + "_text");
-    if (textLayer) {
-        if (textLayer.textItem) {
-            textLayer.allLocked = false;
-            var parts = imagePath.toString().split("/");
-            var filenameWithExt = parts[parts.length - 1];
-            var fileName = filenameWithExt.toString().split(".")[0];
-            var lastName = fileName.split("_").slice(-1)[0];
-            textLayer.textItem.contents = lastName;
-            textLayer.textItem.font = "RamaGothicM-Bold";
-            textLayer.textItem.size = 31.3;
-            textLayer.textItem.fauxBold = false;
-            textLayer.textItem.fauxItalic = false;
-            textLayer.textItem.useAutoLeading = true;
-            $.writeln("✅ Updated text for layer: " + textLayer.name + " → " + lastName);
-        } else {
-            $.writeln("⚠️ Layer found but has no textItem: " + textLayer.name);
-        }
-    } else {
-        $.writeln("❌ Text layer not found: " + layerName + "_text");
-    }
+function replaceSmartObjectContents(position, playerName) {
+    var baseName = position + "_base"; // Ensure your base layers are named like "GK_base", "LB_base", etc.
+    var imageName = playerName + ".png";
+    var inputFile = new File(desktop + '/PLAYER PF/' + imageName);
 
-    app.activeDocument = doc;
-
-    // Determine if replacing a team badge or a player
-    var isTeam = layerName.indexOf("team_") === 0;
-    var layersFolder = Folder($.fileName).parent + "/PLAYER_SMARTLAYERS/";
-    var smartObjectPath = layersFolder + layerName + ".psb";
-    var smartDocFile = new File(smartObjectPath);
-    if (!smartDocFile.exists) {
-        alert("Smart object PSD not found: " + smartObjectPath);
+    if (!inputFile.exists) {
+        alert("Could not find '" + imageName + "' in 'PLAYER PF' on your Desktop.");
         return;
     }
 
-    try {
-        app.open(smartDocFile);
-        var smartDoc = app.activeDocument;
+    var lastName = getLastName(inputFile);
 
-
-        // Choose the correct input folder
-        var imageFolder = Folder($.fileName).parent + "/" + (isTeam ? "Badges" : "output2") + "/";
-        var imageFile = new File(imageFolder + imagePath + ".png");
-        if (imageFile.exists) {
-            var faceDoc = app.open(imageFile);
-            faceDoc.selection.selectAll();
-            faceDoc.selection.copy();
-            faceDoc.close(SaveOptions.DONOTSAVECHANGES);
-
-            app.activeDocument = smartDoc;
-            smartDoc.paste();
-
-            var pastedLayer = smartDoc.activeLayer;
-            pastedLayer.move(smartDoc.layers[smartDoc.layers.length - 1], ElementPlacement.PLACEAFTER);
-
-            if (!isTeam) {
-                // Center and align player images
-                pastedLayer.translate(
-                    (smartDoc.width.as("px") / 2) - ((pastedLayer.bounds[0].as("px") + pastedLayer.bounds[2].as("px")) / 2),
-                    smartDoc.height.as("px") - pastedLayer.bounds[3].as("px")
-                );
-            } else {
-                // Scale and center badges proportionally
-                var bounds = pastedLayer.bounds;
-                var layerW = bounds[2].as("px") - bounds[0].as("px");
-                var layerH = bounds[3].as("px") - bounds[1].as("px");
-                var scaleX = (smartDoc.width.as("px") / layerW) * 100;
-                var scaleY = (smartDoc.height.as("px") / layerH) * 100;
-                var scale = Math.min(scaleX, scaleY);
-                pastedLayer.resize(scale, scale, AnchorPosition.MIDDLECENTER);
-                // Recalculate bounds after resizing
-                bounds = pastedLayer.bounds;
-                // Center the badge layer
-                pastedLayer.translate(
-                    (smartDoc.width.as("px") / 2) - ((bounds[0].as("px") + bounds[2].as("px")) / 2),
-                    (smartDoc.height.as("px") / 2) - ((bounds[1].as("px") + bounds[3].as("px")) / 2)
-                );
-            }
-
-            // Remove all previous layers, keeping only the newly pasted layer
-            app.activeDocument = smartDoc;
-            for (var i = smartDoc.layers.length - 2; i >= 0; i--) {
-                smartDoc.activeLayer = smartDoc.layers[i];
-                smartDoc.activeLayer.remove();
-            }
-
-            smartDoc.close(SaveOptions.SAVECHANGES);
-            $.writeln("✅ Processed: " + smartDoc.name);
-            // Delete the source image file to prevent accumulation
-            try {
-                var fileToDelete = new File(imageFolder + imagePath + ".png");
-                if (fileToDelete.exists) {
-                    fileToDelete.remove();
-                    $.writeln("✅ Deleted old image: " + fileToDelete.fsName);
-                }
-            } catch (delErr) {
-                $.writeln("⚠️ Failed to delete old image: " + delErr.message);
-            }
-        } else {
-            $.writeln("❌ Image file not found: " + imagePath);
+    // Find the layer with this position name
+    var targetLayer = null;
+    for (var i = 0; i < doc.layers.length; i++) {
+        if (doc.layers[i].name == position) {
+            targetLayer = doc.layers[i];
+            break;
         }
-    } catch (e) {
-        $.writeln("⚠️ Error processing " + layerName + ": " + e.message);
-    } finally {
-        app.activeDocument = doc;
+    }
+    if (!targetLayer) {
+        alert('Could not find layer named "' + position + '"');
+        return;
+    }
+
+    // Save bounds for resizing/moving
+    var bounds = targetLayer.bounds;
+    var origLeft = bounds[0].as('px');
+    var origTop = bounds[1].as('px');
+    var origRight = bounds[2].as('px');
+    var origBottom = bounds[3].as('px');
+    var origWidth = origRight - origLeft;
+    var origHeight = origBottom - origTop;
+
+    // Delete the old image layer
+    targetLayer.remove();
+
+    // Find base (clipping) layer by name
+    var baseLayer = null;
+    for (var j = 0; j < doc.layers.length; j++) {
+        if (doc.layers[j].name == baseName) {
+            baseLayer = doc.layers[j];
+            break;
+        }
+    }
+    if (!baseLayer) {
+        alert('Could not find base layer named "' + baseName + '"');
+        return;
+    }
+
+    // Open and copy the new image
+    var newImgDoc = app.open(inputFile);
+    newImgDoc.selection.selectAll();
+    newImgDoc.selection.copy();
+    newImgDoc.close(SaveOptions.DONOTSAVECHANGES);
+
+    // Paste new image
+    doc.paste();
+    var newLayer = doc.activeLayer;
+    newLayer.name = position;
+
+    // Move above the base layer
+    newLayer.move(baseLayer, ElementPlacement.PLACEBEFORE);
+
+    // Resize and move to match original bounds
+    var newBounds = newLayer.bounds;
+    var newLeft = newBounds[0].as('px');
+    var newTop = newBounds[1].as('px');
+    var newRight = newBounds[2].as('px');
+    var newBottom = newBounds[3].as('px');
+    var newWidth = newRight - newLeft;
+    var newHeight = newBottom - newTop;
+
+    // Proportional scaling to fit within original bounds
+    var scaleRatio = Math.min(origWidth / newWidth, origHeight / newHeight) * 100;
+    newLayer.resize(scaleRatio, scaleRatio, AnchorPosition.TOPLEFT);
+
+    // After resizing, get bounds again for correct position
+    var resizedBounds = newLayer.bounds;
+    var resizedLeft = resizedBounds[0].as('px');
+    var resizedTop = resizedBounds[1].as('px');
+
+    newLayer.translate(origLeft - resizedLeft, origTop - resizedTop);
+
+    // Re-apply clipping mask to the base layer
+    newLayer.grouped = true;
+
+    // --- UPDATE THE TEXT LAYER ---
+    var textName = position + "_text"; // Text layer
+    var textLayer = null;
+    for (var t = 0; t < doc.layers.length; t++) {
+        if (doc.layers[t].name == textName) {
+            textLayer = doc.layers[t];
+            break;
+        }
+    }
+    if (textLayer && textLayer.kind == LayerKind.TEXT) {
+        textLayer.textItem.contents = lastName;
     }
 }
 
+// Process each player by mapping to its layer
+var positions = ["GK","LB","LCB","RCB","RB","RCM","LCM","CM","LW","ST","RW"];
+for (var i = 0; i < positions.length; i++) {
+    replaceSmartObjectContents(positions[i], playerNames[i]);
+}
 
-{{REPLACEMENTS}}
-
+alert("All 11 positions have been swapped and clipped to their named base layers!");
