@@ -31,7 +31,7 @@ Promise.all([
 });
 
 // On form submit: build and download the .jsx
-document.getElementById('squadForm').addEventListener('submit', e => {
+document.getElementById('squadForm').addEventListener('submit', async e => {
   e.preventDefault();
 
   // Gather chosen names
@@ -46,17 +46,13 @@ document.getElementById('squadForm').addEventListener('submit', e => {
   const imageFilesArray = '[' +
     players
       .map(nm => {
-        // 1) trim
-        // 2) lowercase
-        // 3) replace any sequence of spaces with a single hyphen
-        const fileName = nm
-          .trim()
-          .toLowerCase()
-          .replace(/\s+/g, '-');
-        return `"${fileName}.png"`;
+        // turn spaces into hyphens and lowercase
+        return `"${nm.trim().toLowerCase().replace(/\s+/g, '-')}.png"`;
       })
       .join(',') +
     ']';
+
+  console.log('Injecting imageFiles =', imageFilesArray);
 
   // Match the placeholder in your template (allowing whitespace)
   const placeholderRE = /{{\s*IMAGE_FILES\s*}}/;
@@ -64,7 +60,7 @@ document.getElementById('squadForm').addEventListener('submit', e => {
   // Inject the real filename array
   let js = template.replace(placeholderRE, imageFilesArray);
 
-  // Download it as .jsx
+  // Trigger download
   const blob = new Blob([js], { type: 'application/javascript' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
