@@ -14,14 +14,14 @@
       margin: 0;
     }
 
-    /* Card container for the form */
+    /* Card container for the form — made a bit smaller */
     .card {
       background: #ffffff;
-      padding: 2rem;
+      padding: 1.5rem;         /* reduced padding */
       border-radius: 12px;
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-      width: 90%;
-      max-width: 480px;
+      width: 85%;              /* slightly narrower */
+      max-width: 360px;        /* smaller max width */
     }
 
     h1 {
@@ -29,6 +29,7 @@
       margin-bottom: 1.5rem;
       font-family: Arial, sans-serif;
       color: #333;
+      font-size: 1.5rem;       /* a touch smaller */
     }
 
     form {
@@ -43,10 +44,12 @@
       color: #444;
     }
 
+    /* All inputs — including those with datalist suggestions — get a bigger, bolder font */
     input {
       width: 100%;
       padding: 0.75rem;
-      font-size: 1rem;
+      font-size: 1.2rem;       /* larger text for better readability */
+      font-weight: 600;        /* thicker text */
       border: 1px solid #ccc;
       border-radius: 6px;
       box-sizing: border-box;
@@ -57,6 +60,12 @@
       outline: none;
       border-color: #005efc;
       box-shadow: 0 0 0 3px rgba(0, 94, 252, 0.25);
+    }
+
+    /* Attempt to style the dropdown suggestions themselves */
+    datalist option {
+      font-size: 1.2rem;
+      font-weight: 600;
     }
 
     button {
