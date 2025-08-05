@@ -9,15 +9,15 @@ var imageFiles  = {{IMAGE_FILES}};   // player PNGs
 var teamFiles   = {{TEAM_FILES}};    // team PNGs
 var nationFiles = {{NATION_FILES}};  // flag PNGs
 
-// Helper: recursive search for any ArtLayer or LayerSet by name
+// Recursive lookup: searches document and all groups for a layer by name
 function findLayerByName(parent, name) {
-    // Search direct ArtLayers
+    // Search all artLayers
     for (var i = 0; i < parent.artLayers.length; i++) {
         if (parent.artLayers[i].name === name) {
             return parent.artLayers[i];
         }
     }
-    // Search LayerSets (groups) and recurse
+    // Search groups and recurse
     for (var j = 0; j < parent.layerSets.length; j++) {
         var group = parent.layerSets[j];
         if (group.name === name) {
@@ -31,10 +31,10 @@ function findLayerByName(parent, name) {
     return null;
 }
 
-// Helper: extract last name token from hyphenated filename
+// Helper to strip extension and get the last hyphen‐delimited token
 function getLastName(file) {
-    var nameOnly = file.name.replace(/\.[^\.]+$/, "");
-    var parts = nameOnly.split("-");
+    var base = file.name.replace(/\.[^\.]+$/, "");
+    var parts = base.split("-");
     return parts.pop();
 }
 
@@ -44,99 +44,82 @@ if (!app.documents.length) {
 }
 var doc = app.activeDocument;
 
-// Generic replacement routine
+// Generalized replacement loop
 function replaceLoop(suffix, files, folderName, baseSuffix, updateText) {
     for (var i = 0; i < positions.length; i++) {
-        var posName    = positions[i],
-            layerName  = posName + suffix,
-            baseName   = posName + baseSuffix,
-            imgName    = files[i],
-            inputFile  = new File(desktop + "/" + folderName + "/" + imgName);
+        var posName   = positions[i],
+            layerName = posName + suffix,
+            baseName  = posName + baseSuffix,
+            imgName   = files[i],
+            file      = new File(desktop + "/" + folderName + "/" + imgName);
 
-        if (!inputFile.exists) {
+        if (!file.exists) {
             alert("Missing file: " + imgName);
             continue;
         }
 
-        // Locate and remove existing layer
+        // Find and remove the existing layer
         var layer = findLayerByName(doc, layerName);
         if (!layer) {
             alert("Could not find layer '" + layerName + "'");
             continue;
         }
-
         var b = layer.bounds;
-        var ol = b[0].as("px"), ot = b[1].as("px"),
-            ow = b[2].as("px") - ol, oh = b[3].as("px") - ot;
+        var ol = b[0].as("px"), ot = b[1].as("px");
+        var ow = b[2].as("px") - ol, oh = b[3].as("px") - ot;
         layer.remove();
 
-        // Locate base layer
+        // Find the clipping base
         var baseLayer = findLayerByName(doc, baseName);
         if (!baseLayer) {
             alert("Could not find base layer '" + baseName + "'");
             continue;
         }
 
-        // Open, copy & paste new image
-        var newDoc = app.open(inputFile);
+        // Open & copy new image
+        var newDoc = app.open(file);
         newDoc.selection.selectAll();
         newDoc.selection.copy();
         newDoc.close(SaveOptions.DONOTSAVECHANGES);
 
+        // Paste and position
         doc.paste();
-        var newLayer = doc.activeLayer;
-        newLayer.name = layerName;
-        newLayer.move(baseLayer, ElementPlacement.PLACEBEFORE);
+        var nl = doc.activeLayer;
+        nl.name = layerName;
+        nl.move(baseLayer, ElementPlacement.PLACEBEFORE);
 
-        // Resize & reposition
-        var nb = newLayer.bounds;
+        // Resize proportionally
+        var nb = nl.bounds;
         var scale = Math.min(
             ow / (nb[2].as("px") - nb[0].as("px")),
             oh / (nb[3].as("px") - nb[1].as("px"))
         ) * 100;
-        newLayer.resize(scale, scale, AnchorPosition.TOPLEFT);
+        nl.resize(scale, scale, AnchorPosition.TOPLEFT);
 
-        var rb = newLayer.bounds;
-        newLayer.translate(ol - rb[0].as("px"), ot - rb[1].as("px"));
+        // Reposition
+        var rb = nl.bounds;
+        nl.translate(ol - rb[0].as("px"), ot - rb[1].as("px"));
 
         // Clip to base
-        newLayer.grouped = true;
+        nl.grouped = true;
 
-        // Optionally update text layers (players and nations)
+        // Update text if needed
         if (updateText) {
             var textLayer = findLayerByName(doc, layerName + "_text");
-            if (textLayer && textLayer.kind === LayerKind.TEXT) {
-                textLayer.textItem.contents = getLastName(inputFile);
+            if (textLayer && textLayer.kind == LayerKind.TEXT) {
+                textLayer.textItem.contents = getLastName(file);
             }
         }
     }
 }
 
-// 1) Players (with text update)
-replaceLoop(
-    "",             // no suffix
-    imageFiles,
-    "PLAYER PF",
-    "_base",
-    true            // update text layer
-);
+// 1) Players (with name text)
+replaceLoop("", imageFiles, "PLAYER PF", "_base", true);
 
-// 2) Teams (no text update)
-replaceLoop(
-    "_team",
-    teamFiles,
-    "TEAMS",
-    "_team_base",
-    false
-);
+// 2) Team badges
+replaceLoop("_team", teamFiles, "TEAMS", "_team_base", false);
 
-// 3) Nations (no text update)
-replaceLoop(
-    "_nation",
-    nationFiles,
-    "NATIONS",
-    "_nation_base",
-    false
-);
+// 3) National flags
+replaceLoop("_nation", nationFiles, "NATIONS", "_nation_base", false);
 
 alert("All 11 positions updated with players, teams & nations!");
