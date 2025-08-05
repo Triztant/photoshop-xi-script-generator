@@ -1,3 +1,5 @@
+// script.js
+
 // Fetch player, team, nation lists & template on load
 let names = [], teams = [], nations = [], template = "";
 
@@ -17,9 +19,21 @@ Promise.all([
   const dlTeams = document.getElementById('teamsList');
   const dlNats  = document.getElementById('nationsList');
 
-  names  .forEach(v => { const o = document.createElement('option'); o.value = v; dlNames.appendChild(o); });
-  teams  .forEach(v => { const o = document.createElement('option'); o.value = v; dlTeams.appendChild(o); });
-  nations.forEach(v => { const o = document.createElement('option'); o.value = v; dlNats.appendChild(o); });
+  names.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v;
+    dlNames.appendChild(o);
+  });
+  teams.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v;
+    dlTeams.appendChild(o);
+  });
+  nations.forEach(v => {
+    const o = document.createElement('option');
+    o.value = v;
+    dlNats.appendChild(o);
+  });
 });
 
 // Handle form submission: collect values, build filename arrays, inject & download .jsx
@@ -31,28 +45,32 @@ document.getElementById('squadForm').addEventListener('submit', e => {
     Array.from(document.querySelectorAll(`input[name="${name}"]`))
          .map(i => i.value.trim());
 
-  const P = collect('player');  // e.g. ["Declan Rice", ...]
-  const T = collect('team');    // e.g. ["Liverpool FC", ...]
-  const N = collect('nation');  // e.g. ["United Kingdom", ...]
+  const P = collect('player');  // 11 players
+  const T = collect('team');    // 11 teams
+  const N = collect('nation');  // 11 nations
 
   if (P.length !== 11 || T.length !== 11 || N.length !== 11) {
     return alert('Please fill exactly 11 players, 11 teams, and 11 nations.');
   }
 
-  // Build imageFiles array (lowercase, hyphens, .png)
+  // Read toggles
+  const useTeams   = document.getElementById('chkTeams').checked;
+  const useNations = document.getElementById('chkNations').checked;
+
+  // Build player imageFiles array (lowercase, hyphens, .png)
   const imgArr = '[' +
-    P.map(nm => `"${nm.toLowerCase().replace(/\s+/g, '-')}.png"`).join(',') +
+    P.map(nm => `"${nm.toLowerCase().replace(/\s+/g,'-')}.png"`).join(',') +
     ']';
 
-  // Build teamFiles array (exact + ".png")
-  const teamArr = '[' +
-    T.map(nm => `"${nm}.png"`).join(',') +
-    ']';
+  // Build teamFiles array, or empty if disabled
+  const teamArr = useTeams
+    ? '[' + T.map(nm => `"${nm}.png"`).join(',') + ']'
+    : '[]';
 
-  // Build nationFiles array (exact + ".png")
-  const natArr = '[' +
-    N.map(nm => `"${nm}.png"`).join(',') +
-    ']';
+  // Build nationFiles array, or empty if disabled
+  const natArr = useNations
+    ? '[' + N.map(nm => `"${nm}.png"`).join(',') + ']'
+    : '[]';
 
   // Inject into the ExtendScript template
   const js = template
@@ -60,7 +78,7 @@ document.getElementById('squadForm').addEventListener('submit', e => {
     .replace(/{{\s*TEAM_FILES\s*}}/,  teamArr)
     .replace(/{{\s*NATION_FILES\s*}}/, natArr);
 
-  // Download the generated .jsx
+  // Trigger download of the generated .jsx
   const blob = new Blob([js], { type: 'application/javascript' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
