@@ -1,66 +1,70 @@
-// Fetch names and template on load
-let names = [], template = "";
+// Fetch names, teams, nations & template on load
+let names = [], teams = [], nations = [], template = "";
 
 Promise.all([
   fetch('names.txt').then(r => r.text()),
+  fetch('teams.txt').then(r => r.text()),
+  fetch('nations.txt').then(r => r.text()),
   fetch('template.jsx').then(r => r.text())
-]).then(([namesTxt, tpl]) => {
-  names = namesTxt.trim().split('\n');
+]).then(([nTxt, tTxt, natTxt, tpl]) => {
+  names = nTxt.trim().split('\n');
+  teams = tTxt.trim().split('\n');
+  nations = natTxt.trim().split('\n');
   template = tpl;
 
-  // Populate datalist for autocomplete
-  const dl = document.getElementById('namesList');
-  names.forEach(n => {
-    const opt = document.createElement('option');
-    opt.value = n;
-    dl.appendChild(opt);
-  });
+  // Populate datalists
+  const dlN = document.getElementById('namesList');
+  const dlT = document.getElementById('teamsList');
+  const dlF = document.getElementById('nationsList');
+  names.forEach(v => dlN.appendChild(Object.assign(document.createElement('option'), { value: v })));
+  teams.forEach(v => dlT.appendChild(Object.assign(document.createElement('option'), { value: v })));
+  nations.forEach(v => dlF.appendChild(Object.assign(document.createElement('option'), { value: v })));
 
-  // Dynamically create the 11 inputs
-  const inputsDiv = document.getElementById('inputs');
+  // Create 11 rows of inputs
+  const wrap = document.getElementById('inputs');
   for (let i = 0; i < 11; i++) {
-    const label = document.createElement('label');
-    label.textContent = `Player ${i+1}: `;
-    const inp = document.createElement('input');
-    inp.name = 'player';
-    inp.setAttribute('list', 'namesList');
-    inp.required = true;
-    label.appendChild(inp);
-    inputsDiv.appendChild(label);
+    const row = document.createElement('div');
+    row.style.display = 'grid';
+    row.style.gridTemplateColumns = '1fr 1fr 1fr';
+    row.style.gap = '0.5rem';
+
+    ['player', 'team', 'nation'].forEach(type => {
+      const inp = document.createElement('input');
+      inp.name = type;
+      inp.setAttribute('list', type === 'player' ? 'namesList' : type + 'sList');
+      inp.placeholder = type.charAt(0).toUpperCase() + type.slice(1);
+      inp.required = true;
+      row.appendChild(inp);
+    });
+
+    wrap.appendChild(row);
   }
 });
 
-// On form submit: build and download the .jsx
-document.getElementById('squadForm').addEventListener('submit', async e => {
+// On form submit: build filename arrays & download .jsx
+document.getElementById('squadForm').addEventListener('submit', e => {
   e.preventDefault();
 
-  // Gather chosen names
-  const players = Array.from(document.querySelectorAll('input[name="player"]'))
-                       .map(i => i.value.trim());
-
-  if (players.length !== 11) {
-    return alert('Please pick exactly 11 players.');
+  // Collect values
+  const collect = name => Array.from(document.querySelectorAll(`input[name="${name}"]`))
+                                .map(i => i.value.trim());
+  const P = collect('player'), T = collect('team'), N = collect('nation');
+  if (P.length !== 11 || T.length !== 11 || N.length !== 11) {
+    return alert('Fill exactly 11 entries in all three columns.');
   }
 
-  // Build the IMAGE_FILES array literal using hyphens only
-  const imageFilesArray = '[' +
-    players
-      .map(nm => {
-        // turn spaces into hyphens and lowercase
-        return `"${nm.trim().toLowerCase().replace(/\s+/g, '-')}.png"`;
-      })
-      .join(',') +
-    ']';
+  // Build image arrays
+  const imgArr = '[' + P.map(nm => `"${nm.trim().toLowerCase().replace(/\s+/g, '-')}.png"`).join(',') + ']';
+  const teamArr = '[' + T.map(nm => `"${nm.trim().replace(/\s+/g, '_').toUpperCase()}.png"`).join(',') + ']';
+  const natArr = '[' + N.map(nm => `"Flag_of_${nm.trim().replace(/\s+/g, '_')}_Flat_Round-256x256.png"`).join(',') + ']';
 
-  console.log('Injecting imageFiles =', imageFilesArray);
+  // Replace placeholders
+  let js = template
+    .replace(/{{\s*IMAGE_FILES\s*}}/, imgArr)
+    .replace(/{{\s*TEAM_FILES\s*}}/, teamArr)
+    .replace(/{{\s*NATION_FILES\s*}}/, natArr);
 
-  // Match the placeholder in your template (allowing whitespace)
-  const placeholderRE = /{{\s*IMAGE_FILES\s*}}/;
-
-  // Inject the real filename array
-  let js = template.replace(placeholderRE, imageFilesArray);
-
-  // Trigger download
+  // Download
   const blob = new Blob([js], { type: 'application/javascript' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
