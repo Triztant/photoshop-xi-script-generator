@@ -7,7 +7,7 @@ Promise.all([
   fetch('all_countries.txt').then(r => r.text()), // country names
   fetch('template.jsx').then(r => r.text())       // ExtendScript template
 ]).then(([namesTxt, teamsTxt, natsTxt, tpl]) => {
-  // Parse each list into an array
+  // Parse each list into arrays
   names   = namesTxt.trim().split('\n');
   teams   = teamsTxt.trim().split('\n');
   nations = natsTxt.trim().split('\n');
@@ -21,13 +21,21 @@ Promise.all([
   names.forEach(v => { let o = document.createElement('option'); o.value = v; dlNames.appendChild(o); });
   teams.forEach(v => { let o = document.createElement('option'); o.value = v; dlTeams.appendChild(o); });
   nations.forEach(v => { let o = document.createElement('option'); o.value = v; dlNats.appendChild(o); });
+
+  // After injecting inputs, capture positions order
+  const positions = Array.from(
+    document.querySelectorAll('#inputs .row label')
+  ).map(lbl => lbl.textContent);
+
+  // Store for use on submit
+  window._positions = positions;
 });
 
-// On form submit: build filename arrays & download the .jsx
+// On form submit: build filename arrays, inject positions, and download .jsx
 document.getElementById('squadForm').addEventListener('submit', e => {
   e.preventDefault();
 
-  // Helper to collect values from inputs by name
+  // Helper to collect input values by name
   const collect = fieldName =>
     Array.from(document.querySelectorAll(`input[name="${fieldName}"]`))
          .map(i => i.value.trim());
@@ -36,7 +44,7 @@ document.getElementById('squadForm').addEventListener('submit', e => {
   const T = collect('team');
   const N = collect('nation');
 
-  // Validate exactly 11 of each
+  // Validate exactly 11 entries
   if (P.length !== 11 || T.length !== 11 || N.length !== 11) {
     alert('Please fill exactly 11 players, 11 teams, and 11 nations.');
     return;
@@ -57,8 +65,9 @@ document.getElementById('squadForm').addEventListener('submit', e => {
     N.map(nm => `"Flag_of_${nm.trim().replace(/\s+/g, '_')}_Flat_Round-256x256.png"`).join(',') +
     ']';
 
-  // Inject into the template
+  // Inject into the template, including POSITIONS
   let js = template
+    .replace(/{{\s*POSITIONS\s*}}/, JSON.stringify(window._positions))
     .replace(/{{\s*IMAGE_FILES\s*}}/, imgArr)
     .replace(/{{\s*TEAM_FILES\s*}}/,  teamArr)
     .replace(/{{\s*NATION_FILES\s*}}/, natArr);
