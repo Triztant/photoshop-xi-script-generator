@@ -82,22 +82,25 @@
   <div class="card">
     <h1>Pick Your 11 (4-4-2)</h1>
     <form id="squadForm">
-      <!-- Autocomplete sources -->
       <datalist id="namesList"></datalist>
       <datalist id="teamsList"></datalist>
       <datalist id="nationsList"></datalist>
 
-      <!-- Container where JS will inject 11 .row elements -->
+      <!-- JS will inject 11 rows here -->
       <div id="inputs"></div>
 
       <button type="submit">Generate &amp; Download .jsx</button>
     </form>
   </div>
 
-  <!-- Inline script to build the rows -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      const positions = ["GK","LB","LCB","RCB","RB","LM","CM","CM","RM","ST","ST"];
+      // Exactly these 11 positions—no duplicates
+      const positions = [
+        "GK", "LB", "LCB", "RCB", "RB",
+        "RCM", "LCM", "CM", "LW", "ST", "RW"
+      ];
+
       const inputsDiv = document.getElementById('inputs');
 
       positions.forEach(pos => {
@@ -106,13 +109,18 @@
 
         ['player','team','nation'].forEach(type => {
           const wrapper = document.createElement('div');
+
           const label = document.createElement('label');
           label.textContent = type === 'player'
-                              ? pos
-                              : `${pos}_${type.charAt(0).toUpperCase()+type.slice(1)}`;
+                            ? pos
+                            : `${pos}_${type.charAt(0).toUpperCase() + type.slice(1)}`;
 
           const input = document.createElement('input');
-          input.setAttribute('list', type === 'player' ? 'namesList' : `${type}sList`);
+          input.setAttribute('list',
+            type === 'player' ? 'namesList'
+            : type === 'team' ? 'teamsList'
+            : 'nationsList'
+          );
           input.name = type;
           input.placeholder = `Type a ${type}…`;
           input.required = true;
@@ -126,7 +134,6 @@
     });
   </script>
 
-  <!-- Your script.js to wire up and download the .jsx -->
   <script src="script.js"></script>
 </body>
 </html>
