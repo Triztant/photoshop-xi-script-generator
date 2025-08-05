@@ -1,15 +1,37 @@
 // Web-generated Photoshop XI Script using layer-based replacement
 var desktop = Folder('~/Desktop');
 
-// Positions in order (must match web UI)
-var positions = ["GK", "LB", "LCB", "RCB", "RB", "RCM", "LCM", "CM", "LW", "ST", "RW"];
+// Positions injected from the page in the exact same order
+var positions = {{POSITIONS}};  // e.g. ["GK","LB","LCB",…]
 
 // Injected filename arrays
-var imageFiles  = {{IMAGE_FILES}};   // e.g. ["player-one.png", …]
-var teamFiles   = {{TEAM_FILES}};    // e.g. ["TEAM_ONE.png", …]
-var nationFiles = {{NATION_FILES}};  // e.g. ["Flag_of_Country_…png", …]
+var imageFiles  = {{IMAGE_FILES}};   // player PNGs
+var teamFiles   = {{TEAM_FILES}};    // team PNGs
+var nationFiles = {{NATION_FILES}};  // flag PNGs
 
-// Helper to extract last name token
+// Helper: recursive search for any ArtLayer or LayerSet by name
+function findLayerByName(parent, name) {
+    // Search direct ArtLayers
+    for (var i = 0; i < parent.artLayers.length; i++) {
+        if (parent.artLayers[i].name === name) {
+            return parent.artLayers[i];
+        }
+    }
+    // Search LayerSets (groups) and recurse
+    for (var j = 0; j < parent.layerSets.length; j++) {
+        var group = parent.layerSets[j];
+        if (group.name === name) {
+            return group;
+        }
+        var found = findLayerByName(group, name);
+        if (found) {
+            return found;
+        }
+    }
+    return null;
+}
+
+// Helper: extract last name token from hyphenated filename
 function getLastName(file) {
     var nameOnly = file.name.replace(/\.[^\.]+$/, "");
     var parts = nameOnly.split("-");
@@ -22,130 +44,99 @@ if (!app.documents.length) {
 }
 var doc = app.activeDocument;
 
-// --- PLAYER IMAGE LOOP ---
-for (var i = 0; i < positions.length; i++) {
-    var posName   = positions[i];
-    var baseName  = posName + "_base";
-    var imgName   = imageFiles[i];
-    var inputFile = new File(desktop + "/PLAYER PF/" + imgName);
+// Generic replacement routine
+function replaceLoop(suffix, files, folderName, baseSuffix, updateText) {
+    for (var i = 0; i < positions.length; i++) {
+        var posName    = positions[i],
+            layerName  = posName + suffix,
+            baseName   = posName + baseSuffix,
+            imgName    = files[i],
+            inputFile  = new File(desktop + "/" + folderName + "/" + imgName);
 
-    if (!inputFile.exists) {
-        alert("Missing player image: " + imgName);
-        continue;
-    }
-    var lastName = getLastName(inputFile);
+        if (!inputFile.exists) {
+            alert("Missing file: " + imgName);
+            continue;
+        }
 
-    // Remove existing layer
-    var layer = doc.layers.byName(posName);
-    var b = layer.bounds;
-    var ol = b[0].as("px"), ot = b[1].as("px");
-    var ow = b[2].as("px") - ol, oh = b[3].as("px") - ot;
-    layer.remove();
+        // Locate and remove existing layer
+        var layer = findLayerByName(doc, layerName);
+        if (!layer) {
+            alert("Could not find layer '" + layerName + "'");
+            continue;
+        }
 
-    // Open, copy & paste new image
-    var baseLayer = doc.layers.byName(baseName);
-    var newDoc = app.open(inputFile);
-    newDoc.selection.selectAll(); newDoc.selection.copy();
-    newDoc.close(SaveOptions.DONOTSAVECHANGES);
+        var b = layer.bounds;
+        var ol = b[0].as("px"), ot = b[1].as("px"),
+            ow = b[2].as("px") - ol, oh = b[3].as("px") - ot;
+        layer.remove();
 
-    doc.paste();
-    var newLayer = doc.activeLayer;
-    newLayer.name = posName;
-    newLayer.move(baseLayer, ElementPlacement.PLACEBEFORE);
+        // Locate base layer
+        var baseLayer = findLayerByName(doc, baseName);
+        if (!baseLayer) {
+            alert("Could not find base layer '" + baseName + "'");
+            continue;
+        }
 
-    // Resize & reposition
-    var nb = newLayer.bounds;
-    var scale = Math.min(ow / (nb[2].as("px") - nb[0].as("px")),
-                         oh / (nb[3].as("px") - nb[1].as("px"))) * 100;
-    newLayer.resize(scale, scale, AnchorPosition.TOPLEFT);
-    var rb = newLayer.bounds;
-    newLayer.translate(ol - rb[0].as("px"), ot - rb[1].as("px"));
+        // Open, copy & paste new image
+        var newDoc = app.open(inputFile);
+        newDoc.selection.selectAll();
+        newDoc.selection.copy();
+        newDoc.close(SaveOptions.DONOTSAVECHANGES);
 
-    newLayer.grouped = true;
+        doc.paste();
+        var newLayer = doc.activeLayer;
+        newLayer.name = layerName;
+        newLayer.move(baseLayer, ElementPlacement.PLACEBEFORE);
 
-    // Update text layer
-    var textLayer = doc.layers.byName(posName + "_text");
-    if (textLayer.kind == LayerKind.TEXT) {
-        textLayer.textItem.contents = lastName;
+        // Resize & reposition
+        var nb = newLayer.bounds;
+        var scale = Math.min(
+            ow / (nb[2].as("px") - nb[0].as("px")),
+            oh / (nb[3].as("px") - nb[1].as("px"))
+        ) * 100;
+        newLayer.resize(scale, scale, AnchorPosition.TOPLEFT);
+
+        var rb = newLayer.bounds;
+        newLayer.translate(ol - rb[0].as("px"), ot - rb[1].as("px"));
+
+        // Clip to base
+        newLayer.grouped = true;
+
+        // Optionally update text layers (players and nations)
+        if (updateText) {
+            var textLayer = findLayerByName(doc, layerName + "_text");
+            if (textLayer && textLayer.kind === LayerKind.TEXT) {
+                textLayer.textItem.contents = getLastName(inputFile);
+            }
+        }
     }
 }
 
-// --- TEAM BADGE LOOP ---
-for (var i = 0; i < positions.length; i++) {
-    var posName   = positions[i];
-    var baseName  = posName + "_team_base";
-    var imgName   = teamFiles[i];
-    var inputFile = new File(desktop + "/TEAMS/" + imgName);
+// 1) Players (with text update)
+replaceLoop(
+    "",             // no suffix
+    imageFiles,
+    "PLAYER PF",
+    "_base",
+    true            // update text layer
+);
 
-    if (!inputFile.exists) {
-        alert("Missing team badge: " + imgName);
-        continue;
-    }
+// 2) Teams (no text update)
+replaceLoop(
+    "_team",
+    teamFiles,
+    "TEAMS",
+    "_team_base",
+    false
+);
 
-    var layerName = posName + "_team";
-    var layer     = doc.layers.byName(layerName);
-    var b         = layer.bounds;
-    var ol = b[0].as("px"), ot = b[1].as("px");
-    var ow = b[2].as("px") - ol, oh = b[3].as("px") - ot;
-    layer.remove();
-
-    var baseLayer = doc.layers.byName(baseName);
-    var newDoc = app.open(inputFile);
-    newDoc.selection.selectAll(); newDoc.selection.copy();
-    newDoc.close(SaveOptions.DONOTSAVECHANGES);
-
-    doc.paste();
-    var newLayer = doc.activeLayer;
-    newLayer.name = layerName;
-    newLayer.move(baseLayer, ElementPlacement.PLACEBEFORE);
-
-    var nb = newLayer.bounds;
-    var scale = Math.min(ow / (nb[2].as("px") - nb[0].as("px")),
-                         oh / (nb[3].as("px") - nb[1].as("px"))) * 100;
-    newLayer.resize(scale, scale, AnchorPosition.TOPLEFT);
-    var rb = newLayer.bounds;
-    newLayer.translate(ol - rb[0].as("px"), ot - rb[1].as("px"));
-
-    newLayer.grouped = true;
-}
-
-// --- NATION FLAG LOOP ---
-for (var i = 0; i < positions.length; i++) {
-    var posName   = positions[i];
-    var baseName  = posName + "_nation_base";
-    var imgName   = nationFiles[i];
-    var inputFile = new File(desktop + "/NATIONS/" + imgName);
-
-    if (!inputFile.exists) {
-        alert("Missing flag: " + imgName);
-        continue;
-    }
-
-    var layerName = posName + "_nation";
-    var layer     = doc.layers.byName(layerName);
-    var b         = layer.bounds;
-    var ol = b[0].as("px"), ot = b[1].as("px");
-    var ow = b[2].as("px") - ol, oh = b[3].as("px") - ot;
-    layer.remove();
-
-    var baseLayer = doc.layers.byName(baseName);
-    var newDoc = app.open(inputFile);
-    newDoc.selection.selectAll(); newDoc.selection.copy();
-    newDoc.close(SaveOptions.DONOTSAVECHANGES);
-
-    doc.paste();
-    var newLayer = doc.activeLayer;
-    newLayer.name = layerName;
-    newLayer.move(baseLayer, ElementPlacement.PLACEBEFORE);
-
-    var nb = newLayer.bounds;
-    var scale = Math.min(ow / (nb[2].as("px") - nb[0].as("px")),
-                         oh / (nb[3].as("px") - nb[1].as("px"))) * 100;
-    newLayer.resize(scale, scale, AnchorPosition.TOPLEFT);
-    var rb = newLayer.bounds;
-    newLayer.translate(ol - rb[0].as("px"), ot - rb[1].as("px"));
-
-    newLayer.grouped = true;
-}
+// 3) Nations (no text update)
+replaceLoop(
+    "_nation",
+    nationFiles,
+    "NATIONS",
+    "_nation_base",
+    false
+);
 
 alert("All 11 positions updated with players, teams & nations!");
