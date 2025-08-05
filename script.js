@@ -13,73 +13,68 @@ Promise.all([
   nations = natsTxt.trim().split('\n');
   template = tpl;
 
-  // Populate datalists for autocomplete
-  const dlNames = document.getElementById('namesList');
-  const dlTeams = document.getElementById('teamsList');
-  const dlNats  = document.getElementById('nationsList');
+  // Populate datalists
+  const dl0 = document.getElementById('namesList');
+  const dl1 = document.getElementById('teamsList');
+  const dl2 = document.getElementById('nationsList');
 
-  names.forEach(v => { let o = document.createElement('option'); o.value = v; dlNames.appendChild(o); });
-  teams.forEach(v => { let o = document.createElement('option'); o.value = v; dlTeams.appendChild(o); });
-  nations.forEach(v => { let o = document.createElement('option'); o.value = v; dlNats.appendChild(o); });
+  names  .forEach(v => { let o = document.createElement('option'); o.value = v; dl0.appendChild(o); });
+  teams  .forEach(v => { let o = document.createElement('option'); o.value = v; dl1.appendChild(o); });
+  nations.forEach(v => { let o = document.createElement('option'); o.value = v; dl2.appendChild(o); });
 
-  // After injecting inputs, capture positions order
-  const positions = Array.from(
-    document.querySelectorAll('#inputs .row label')
-  ).map(lbl => lbl.textContent);
-
-  // Store for use on submit
-  window._positions = positions;
+  // Build 11 rows exactly once
+  const positions = ["GK","LB","LCB","RCB","RB","RCM","LCM","CM","LW","ST","RW"];
+  const wrap = document.getElementById('inputs');
+  positions.forEach(pos => {
+    const row = document.createElement('div');
+    row.className = 'row';
+    ['player','team','nation'].forEach(type => {
+      const wrapi = document.createElement('div');
+      const lbl   = document.createElement('label');
+      lbl.textContent = type==='player' ? pos
+                       : `${pos}_${type.charAt(0).toUpperCase() + type.slice(1)}`;
+      const inp = document.createElement('input');
+      inp.name = type;
+      inp.setAttribute('list',
+        type==='player' ? 'namesList'
+        : type==='team'   ? 'teamsList'
+                         : 'nationsList'
+      );
+      inp.placeholder = `Type a ${type}…`;
+      inp.required = true;
+      wrapi.append(lbl, inp);
+      row.appendChild(wrapi);
+    });
+    wrap.appendChild(row);
+  });
 });
 
-// On form submit: build filename arrays, inject positions, and download .jsx
+// On submit: build filename arrays & download .jsx
 document.getElementById('squadForm').addEventListener('submit', e => {
   e.preventDefault();
+  const collect = n =>
+    Array.from(document.querySelectorAll(`input[name="${n}"]`)).map(i => i.value.trim());
 
-  // Helper to collect input values by name
-  const collect = fieldName =>
-    Array.from(document.querySelectorAll(`input[name="${fieldName}"]`))
-         .map(i => i.value.trim());
+  const P = collect('player'),
+        T = collect('team'),
+        N = collect('nation');
 
-  const P = collect('player');
-  const T = collect('team');
-  const N = collect('nation');
-
-  // Validate exactly 11 entries
-  if (P.length !== 11 || T.length !== 11 || N.length !== 11) {
-    alert('Please fill exactly 11 players, 11 teams, and 11 nations.');
-    return;
+  if (P.length!==11 || T.length!==11 || N.length!==11) {
+    return alert('Please fill exactly 11 players, 11 teams, and 11 nations.');
   }
 
-  // Build the IMAGE_FILES array literal
-  const imgArr = '[' +
-    P.map(nm => `"${nm.toLowerCase().replace(/\s+/g, '-')}.png"`).join(',') +
-    ']';
+  const imgArr  = '[' + P.map(nm => `"${nm.toLowerCase().replace(/\s+/g,'-')}.png"`).join(',') + ']';
+  const teamArr = '[' + T.map(nm => `"${nm.trim().replace(/\s+/g,'_')}.png"`).join(',')    + ']';
+  const natArr  = '[' + N.map(nm => `"Flag_of_${nm.trim().replace(/\s+/g,'_')}_Flat_Round-256x256.png"`).join(',') + ']';
 
-  // Build the TEAM_FILES array literal
-  const teamArr = '[' +
-    T.map(nm => `"${nm.trim().replace(/\s+/g, '_')}.png"`).join(',') +
-    ']';
-
-  // Build the NATION_FILES array literal
-  const natArr = '[' +
-    N.map(nm => `"Flag_of_${nm.trim().replace(/\s+/g, '_')}_Flat_Round-256x256.png"`).join(',') +
-    ']';
-
-  // Inject into the template, including POSITIONS
   let js = template
-    .replace(/{{\s*POSITIONS\s*}}/, JSON.stringify(window._positions))
     .replace(/{{\s*IMAGE_FILES\s*}}/, imgArr)
     .replace(/{{\s*TEAM_FILES\s*}}/,  teamArr)
     .replace(/{{\s*NATION_FILES\s*}}/, natArr);
 
-  // Trigger download of the generated .jsx
-  const blob = new Blob([js], { type: 'application/javascript' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'photoshop_xi_script.jsx';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+  const blob = new Blob([js], { type:'application/javascript' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = 'photoshop_xi_script.jsx';
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
 });
