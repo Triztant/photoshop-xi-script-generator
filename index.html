@@ -34,31 +34,34 @@
     form {
       display: flex;
       flex-direction: column;
+      gap: 1.5rem;
+    }
+    .row {
+      display: grid;
       gap: 1rem;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3,1fr);
-      gap: 0.75rem;
-    }
-    .dropdown-field {
+    .row.gk { grid-template-columns: 1fr; }
+    .row.def { grid-template-columns: repeat(4,1fr); }
+    .row.mid { grid-template-columns: repeat(3,1fr); }
+    .row.att { grid-template-columns: repeat(3,1fr); }
+    .position {
       display: flex;
       flex-direction: column;
-      gap: 0.25rem;
+      gap: 0.5rem;
     }
-    .dropdown-field label {
+    .position label {
       font-size: 0.85rem;
       font-weight: 500;
       color: #555;
     }
-    .dropdown-field input {
+    .position input {
       padding: 0.6rem 0.75rem;
       font-size: 0.95rem;
       border: 1px solid #ccc;
       border-radius: 0.5rem;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
-    .dropdown-field input:focus {
+    .position input:focus {
       outline: none;
       border-color: #005efc;
       box-shadow: 0 0 0 3px rgba(0,94,252,0.2);
@@ -66,7 +69,6 @@
     .toggles {
       display: flex;
       justify-content: space-between;
-      align-items: center;
       gap: 1rem;
     }
     .toggles label {
@@ -111,155 +113,122 @@
       <datalist id="teamsList"></datalist>
       <datalist id="nationsList"></datalist>
 
-      <div class="grid">
-        <!-- Row template repeated 11 times -->
-        <!-- 1: GK -->
-        <div class="dropdown-field">
+      <!-- 1) GK -->
+      <div class="row gk">
+        <div class="position">
           <label for="player1">GK</label>
           <input list="namesList" id="player1" name="player" placeholder="Name…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="team1">GK Team</label>
+          <label for="team1">Team</label>
           <input list="teamsList" id="team1" name="team" placeholder="Team…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="nation1">GK Nation</label>
+          <label for="nation1">Nation</label>
           <input list="nationsList" id="nation1" name="nation" placeholder="Nation…" required>
         </div>
-        <!-- 2: LB -->
-        <div class="dropdown-field">
-          <label for="player2">LB</label>
+      </div>
+
+      <!-- 2) Defense -->
+      <div class="row def">
+        <!-- RB -->
+        <div class="position">
+          <label for="player2">RB</label>
           <input list="namesList" id="player2" name="player" placeholder="Name…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="team2">LB Team</label>
+          <label for="team2">Team</label>
           <input list="teamsList" id="team2" name="team" placeholder="Team…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="nation2">LB Nation</label>
+          <label for="nation2">Nation</label>
           <input list="nationsList" id="nation2" name="nation" placeholder="Nation…" required>
         </div>
-        <!-- 3: LCB -->
-        <div class="dropdown-field">
-          <label for="player3">LCB</label>
+        <!-- RCB -->
+        <div class="position">
+          <label for="player3">RCB</label>
           <input list="namesList" id="player3" name="player" placeholder="Name…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="team3">LCB Team</label>
+          <label for="team3">Team</label>
           <input list="teamsList" id="team3" name="team" placeholder="Team…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="nation3">LCB Nation</label>
+          <label for="nation3">Nation</label>
           <input list="nationsList" id="nation3" name="nation" placeholder="Nation…" required>
         </div>
-        <!-- 4: RCB -->
-        <div class="dropdown-field">
-          <label for="player4">RCB</label>
+        <!-- LCB -->
+        <div class="position">
+          <label for="player4">LCB</label>
           <input list="namesList" id="player4" name="player" placeholder="Name…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="team4">RCB Team</label>
+          <label for="team4">Team</label>
           <input list="teamsList" id="team4" name="team" placeholder="Team…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="nation4">RCB Nation</label>
+          <label for="nation4">Nation</label>
           <input list="nationsList" id="nation4" name="nation" placeholder="Nation…" required>
         </div>
-        <!-- 5: RB -->
-        <div class="dropdown-field">
-          <label for="player5">RB</label>
+        <!-- LB -->
+        <div class="position">
+          <label for="player5">LB</label>
           <input list="namesList" id="player5" name="player" placeholder="Name…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="team5">RB Team</label>
+          <label for="team5">Team</label>
           <input list="teamsList" id="team5" name="team" placeholder="Team…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="nation5">RB Nation</label>
+          <label for="nation5">Nation</label>
           <input list="nationsList" id="nation5" name="nation" placeholder="Nation…" required>
         </div>
-        <!-- 6: RCM -->
-        <div class="dropdown-field">
+      </div>
+
+      <!-- 3) Midfield -->
+      <div class="row mid">
+        <!-- RCM -->
+        <div class="position">
           <label for="player6">RCM</label>
           <input list="namesList" id="player6" name="player" placeholder="Name…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="team6">RCM Team</label>
+          <label for="team6">Team</label>
           <input list="teamsList" id="team6" name="team" placeholder="Team…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="nation6">RCM Nation</label>
+          <label for="nation6">Nation</label>
           <input list="nationsList" id="nation6" name="nation" placeholder="Nation…" required>
         </div>
-        <!-- 7: LCM -->
-        <div class="dropdown-field">
-          <label for="player7">LCM</label>
+        <!-- CM -->
+        <div class="position">
+          <label for="player7">CM</label>
           <input list="namesList" id="player7" name="player" placeholder="Name…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="team7">LCM Team</label>
+          <label for="team7">Team</label>
           <input list="teamsList" id="team7" name="team" placeholder="Team…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="nation7">LCM Nation</label>
+          <label for="nation7">Nation</label>
           <input list="nationsList" id="nation7" name="nation" placeholder="Nation…" required>
         </div>
-        <!-- 8: CM -->
-        <div class="dropdown-field">
-          <label for="player8">CM</label>
+        <!-- LCM -->
+        <div class="position">
+          <label for="player8">LCM</label>
           <input list="namesList" id="player8" name="player" placeholder="Name…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="team8">CM Team</label>
+          <label for="team8">Team</label>
           <input list="teamsList" id="team8" name="team" placeholder="Team…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="nation8">CM Nation</label>
+          <label for="nation8">Nation</label>
           <input list="nationsList" id="nation8" name="nation" placeholder="Nation…" required>
         </div>
-        <!-- 9: LW -->
-        <div class="dropdown-field">
-          <label for="player9">LW</label>
+      </div>
+
+      <!-- 4) Attack -->
+      <div class="row att">
+        <!-- RW -->
+        <div class="position">
+          <label for="player9">RW</label>
           <input list="namesList" id="player9" name="player" placeholder="Name…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="team9">LW Team</label>
+          <label for="team9">Team</label>
           <input list="teamsList" id="team9" name="team" placeholder="Team…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="nation9">LW Nation</label>
+          <label for="nation9">Nation</label>
           <input list="nationsList" id="nation9" name="nation" placeholder="Nation…" required>
         </div>
-        <!-- 10: ST -->
-        <div class="dropdown-field">
+        <!-- ST -->
+        <div class="position">
           <label for="player10">ST</label>
           <input list="namesList" id="player10" name="player" placeholder="Name…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="team10">ST Team</label>
+          <label for="team10">Team</label>
           <input list="teamsList" id="team10" name="team" placeholder="Team…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="nation10">ST Nation</label>
+          <label for="nation10">Nation</label>
           <input list="nationsList" id="nation10" name="nation" placeholder="Nation…" required>
         </div>
-        <!-- 11: RW -->
-        <div class="dropdown-field">
-          <label for="player11">RW</label>
+        <!-- LW -->
+        <div class="position">
+          <label for="player11">LW</label>
           <input list="namesList" id="player11" name="player" placeholder="Name…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="team11">RW Team</label>
+          <label for="team11">Team</label>
           <input list="teamsList" id="team11" name="team" placeholder="Team…" required>
-        </div>
-        <div class="dropdown-field">
-          <label for="nation11">RW Nation</label>
+          <label for="nation11">Nation</label>
           <input list="nationsList" id="nation11" name="nation" placeholder="Nation…" required>
         </div>
       </div>
 
       <div class="toggles">
-        <label><input type="checkbox" id="chkTeams" checked> Include Teams</label>
+        <label><input type="checkbox" id="chkTeams"   checked> Include Teams</label>
         <label><input type="checkbox" id="chkNations" checked> Include Nations</label>
       </div>
 
@@ -271,7 +240,7 @@
   <script>
     function toggleFields(name, show) {
       document.querySelectorAll(`input[name="${name}"]`).forEach(input => {
-        input.closest('.dropdown-field').style.display = show ? '' : 'none';
+        input.closest('.position').style.display = show ? '' : 'none';
         input.required = show;
       });
     }
