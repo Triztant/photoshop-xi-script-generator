@@ -1,117 +1,86 @@
-// Web-generated Photoshop XI Script using layer-based replacement
+// Web-generated Photoshop XI Script: players, teams & nations
 var desktop = Folder('~/Desktop');
 
-// List of layer names (positions)
-var positions = ["GK", "LB", "LCB", "RCB", "RB", "RCM", "LCM", "CM", "LW", "ST", "RW"];
+// Fixed list of positions
+var positions = [
+  "GK","LB","LCB","RCB","RB",
+  "RCM","LCM","CM","LW","ST","RW"
+];
 
-// Dynamically injected list of image filenames (must match positions order)
-var imageFiles = {{IMAGE_FILES}}; // e.g. ["declan-rice.png", "lionel-messi.png", …]
+// Dynamically injected filename arrays (align with positions)
+var imageFiles  = {{IMAGE_FILES}};   // e.g. ["ryan-gravenberch.png", …]
+var teamFiles   = {{TEAM_FILES}};    // e.g. ["SL_BENFICA.png", …]
+var nationFiles = {{NATION_FILES}};  // e.g. ["flag_of_england_flat-round-256x256.png", …]
 
-// Get last name from image file name ("nathan-ake.png" → "ake")
+// Helper: extract last token after hyphens
 function getLastName(file) {
-    var nameOnly = file.name.replace(/\.[^\.]+$/, "");
-    var parts = nameOnly.split("-");
-    return parts.length > 1 ? parts[parts.length - 1] : nameOnly;
+  var nameOnly = file.name.replace(/\.[^\.]+$/, "");
+  var parts   = nameOnly.split("-");
+  return parts.length>1 ? parts.pop() : nameOnly;
 }
 
-if (app.documents.length == 0) {
-    alert("Open your template PSD first!");
-    throw "No document open.";
+if (!app.documents.length) {
+  alert("Open your template PSD first!");
+  throw "No document open.";
 }
 var doc = app.activeDocument;
 
-for (var p = 0; p < positions.length; p++) {
-    var posName = positions[p];
-    var baseName = posName + "_base";
+function replaceLayer(pos, suffix, files, folderName, baseSuffix) {
+  var baseName = pos + baseSuffix;
+  var layerName = pos + suffix;
+  var imgName = files.shift();
+  var file = new File(desktop + '/' + folderName + '/' + imgName);
+  if (!file.exists) {
+    alert("Missing " + suffix + ": " + imgName);
+    return;
+  }
+  var last = getLastName(file);
 
-    var imageName = imageFiles[p];
-    var inputFile = new File(desktop + '/PLAYER PF/' + imageName);
+  // Find & remove old layer
+  var target = doc.layers.byName(layerName);
+  var bounds = target.bounds;
+  var origLeft = bounds[0].as('px'), origTop = bounds[1].as('px');
+  var origW = bounds[2].as('px') - origLeft;
+  var origH = bounds[3].as('px') - origTop;
+  target.remove();
 
-    if (!inputFile.exists) {
-        alert("Could not find '" + imageName + "' in 'PLAYER PF' on your Desktop.");
-        continue;
-    }
+  // Find base layer
+  var base = doc.layers.byName(baseName);
 
-    var lastName = getLastName(inputFile);
+  // Open & copy new image
+  var newDoc = app.open(file);
+  newDoc.selection.selectAll(); newDoc.selection.copy();
+  newDoc.close(SaveOptions.DONOTSAVECHANGES);
 
-    // Find the target layer
-    var targetLayer = null;
-    for (var i = 0; i < doc.layers.length; i++) {
-        if (doc.layers[i].name == posName) {
-            targetLayer = doc.layers[i];
-            break;
-        }
-    }
-    if (!targetLayer) {
-        alert('Could not find layer named "' + posName + '"');
-        continue;
-    }
+  // Paste, name, clip, resize, reposition
+  doc.paste();
+  var nl = doc.activeLayer;
+  nl.name = layerName;
+  nl.move(base, ElementPlacement.PLACEBEFORE);
 
-    // Save original bounds
-    var bounds = targetLayer.bounds;
-    var origLeft = bounds[0].as('px');
-    var origTop = bounds[1].as('px');
-    var origRight = bounds[2].as('px');
-    var origBottom = bounds[3].as('px');
-    var origWidth = origRight - origLeft;
-    var origHeight = origBottom - origTop;
+  var nb = nl.bounds;
+  var nw = nb[2].as('px') - nb[0].as('px');
+  var nh = nb[3].as('px') - nb[1].as('px');
+  nl.resize(Math.min(origW/nw, origH/nh)*100, Math.min(origW/nw, origH/nh)*100, AnchorPosition.TOPLEFT);
+  var rb = nl.bounds;
+  nl.translate(origLeft - rb[0].as('px'), origTop - rb[1].as('px'));
+  nl.grouped = true;
 
-    // Remove the old image layer
-    targetLayer.remove();
-
-    // Find base layer
-    var baseLayer = null;
-    for (var j = 0; j < doc.layers.length; j++) {
-        if (doc.layers[j].name == baseName) {
-            baseLayer = doc.layers[j];
-            break;
-        }
-    }
-    if (!baseLayer) {
-        alert('Could not find base layer named "' + baseName + '"');
-        continue;
-    }
-
-    // Open and copy new image
-    var newImgDoc = app.open(inputFile);
-    newImgDoc.selection.selectAll();
-    newImgDoc.selection.copy();
-    newImgDoc.close(SaveOptions.DONOTSAVECHANGES);
-
-    // Paste and name
-    doc.paste();
-    var newLayer = doc.activeLayer;
-    newLayer.name = posName;
-    newLayer.move(baseLayer, ElementPlacement.PLACEBEFORE);
-
-    // Resize proportionally
-    var newBounds = newLayer.bounds;
-    var newWidth = newBounds[2].as('px') - newBounds[0].as('px');
-    var newHeight = newBounds[3].as('px') - newBounds[1].as('px');
-    var scaleRatio = Math.min(origWidth / newWidth, origHeight / newHeight) * 100;
-    newLayer.resize(scaleRatio, scaleRatio, AnchorPosition.TOPLEFT);
-
-    // Reposition
-    var resizedBounds = newLayer.bounds;
-    var resizedLeft = resizedBounds[0].as('px');
-    var resizedTop = resizedBounds[1].as('px');
-    newLayer.translate(origLeft - resizedLeft, origTop - resizedTop);
-
-    // Apply clipping mask
-    newLayer.grouped = true;
-
-    // Update text layer
-    var textName = posName + "_text";
-    var textLayer = null;
-    for (var t = 0; t < doc.layers.length; t++) {
-        if (doc.layers[t].name == textName) {
-            textLayer = doc.layers[t];
-            break;
-        }
-    }
-    if (textLayer && textLayer.kind == LayerKind.TEXT) {
-        textLayer.textItem.contents = lastName;
-    }
+  // Update text layer for players & nations
+  if (suffix !== '_team') {
+    var txt = doc.layers.byName(layerName + '_text');
+    if (txt.kind == LayerKind.TEXT) txt.textItem.contents = last;
+  }
 }
 
-alert("All 11 positions have been updated!");
+// Process all three
+var pf = imageFiles.slice();
+var tf = teamFiles.slice();
+var nf = nationFiles.slice();
+for (var i=0; i<positions.length; i++) {
+  replaceLayer(positions[i], '',   pf, 'PLAYER PF', '_base');
+  replaceLayer(positions[i], '_team', tf, 'TEAMS', '_team_base');
+  replaceLayer(positions[i], '_nation', nf, 'NATIONS', '_nation_base');
+}
+
+alert("All layers updated: players, teams & nations!");
