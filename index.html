@@ -5,16 +5,14 @@
   <title>Squad → Photoshop XI Script</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
-    /* 1. Center the card in the viewport */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       display: grid;
       place-items: center;
       min-height: 100vh;
-      margin: 0;
       background: linear-gradient(135deg,#e6ecf2,#f4f6f8);
       font-family: 'Poppins', sans-serif;
     }
-    /* 2. Card styling */
     .card {
       background: #fff;
       padding: 2rem;
@@ -31,21 +29,17 @@
       font-size: 1.75rem;
       font-weight: 600;
       color: #333;
-      margin: 0;
     }
     form {
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
     }
-    /* 3. Four distinct rows */
     .row {
-      width: 100%;
       display: flex;
       justify-content: center;
       gap: 1rem;
     }
-    /* 4. Position box styling */
     .position {
       background: #f9fafb;
       padding: 0.75rem;
@@ -72,7 +66,6 @@
       border-color: #005efc;
       box-shadow: 0 0 0 3px rgba(0,94,252,0.2);
     }
-    /* 5. Toggles and button centering */
     .toggles {
       display: flex;
       justify-content: center;
@@ -238,7 +231,12 @@
   <script>
     function toggleFields(name, show) {
       document.querySelectorAll(`input[name="${name}"]`).forEach(input => {
-        input.closest('.position').style.display = show ? '' : 'none';
+        // hide/show only the label + input for this field
+        const label = input.previousElementSibling;
+        if (label && label.tagName === 'LABEL') {
+          label.style.display = show ? '' : 'none';
+        }
+        input.style.display = show ? '' : 'none';
         input.required = show;
       });
     }
