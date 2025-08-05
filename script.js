@@ -34,36 +34,46 @@ Promise.all([
   });
 });
 
-// Handle form submission: collect values, build arrays, inject & download .jsx
+// Handle form submission: build filename arrays, inject into the template, and download the .jsx
 document.getElementById('squadForm').addEventListener('submit', e => {
   e.preventDefault();
 
-  // Helper to grab the 11 values for a given name
+  // Helper: collect 11 values for a given input name
   const collect = name =>
     Array.from(document.querySelectorAll(`input[name="${name}"]`))
          .map(i => i.value.trim());
 
-  const P = collect('player');
-  const T = collect('team');
-  const N = collect('nation');
+  const P = collect('player');   // 11 player names
+  const T = collect('team');     // 11 team names
+  const N = collect('nation');   // 11 nation names
 
+  // Validate
   if (P.length !== 11 || T.length !== 11 || N.length !== 11) {
-    alert('Please fill exactly 11 players, 11 teams, and 11 nations.');
-    return;
+    return alert('Please fill exactly 11 players, 11 teams, and 11 nations.');
   }
 
-  // Build the three filename arrays
-  const imgArr  = '[' + P.map(nm => `"${nm.toLowerCase().replace(/\s+/g,'-')}.png"`).join(',') + ']';
-  const teamArr = '[' + T.map(nm => `"${nm.trim().replace(/\s+/g,'_')}.png"`).join(',')    + ']';
-  const natArr  = '[' + N.map(nm => `"Flag_of_${nm.trim().replace(/\s+/g,'_')}_Flat_Round-256x256.png"`).join(',') + ']';
+  // Build imageFiles array (lowercase, hyphens, .png)
+  const imgArr = '[' +
+    P.map(nm => `"${nm.toLowerCase().replace(/\s+/g, '-')}.png"`).join(',') +
+    ']';
 
-  // Inject into your template.jsx
-  let js = template
+  // Build teamFiles array (exact + .png)
+  const teamArr = '[' +
+    T.map(nm => `"${nm}.png"`).join(',') +
+    ']';
+
+  // Build nationFiles array (exact + .png)
+  const natArr = '[' +
+    N.map(nm => `"${nm}.png"`).join(',') +
+    ']';
+
+  // Inject into the ExtendScript template
+  const js = template
     .replace(/{{\s*IMAGE_FILES\s*}}/, imgArr)
     .replace(/{{\s*TEAM_FILES\s*}}/,  teamArr)
     .replace(/{{\s*NATION_FILES\s*}}/, natArr);
 
-  // Trigger download
+  // Trigger download of the generated .jsx
   const blob = new Blob([js], { type: 'application/javascript' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
