@@ -1,223 +1,263 @@
 // Web-generated Photoshop XI Script using layer-based replacement
 var desktop = Folder('~/Desktop');
 
-// Your 11 positions
-var positions = ["GK","LB","LCB","RCB","RB","RCM","LCM","CM","LW","ST","RW"];
+// List of layer names (positions)
+var positions = ["GK", "LB", "LCB", "RCB", "RB", "RCM", "LCM", "CM", "LW", "ST", "RW"];
 
-// Injected by the web UI
-var imageFiles  = {{IMAGE_FILES}};
-var teamFiles   = {{TEAM_FILES}};
-var nationFiles = {{NATION_FILES}};
+// Dynamically injected lists of filenames
+var imageFiles  = {{IMAGE_FILES}};   // e.g. ["declan-rice.png", …]
+var teamFiles   = {{TEAM_FILES}};    // e.g. ["Liverpool FC.png", …]
+var nationFiles = {{NATION_FILES}};  // e.g. ["United Kingdom.png", …]
 
-// Recursive finder for any ArtLayer or LayerSet by name
-function findLayerByNameRecursive(parent, name) {
-  // 1) Check artLayers
-  for (var i = 0; i < parent.artLayers.length; i++) {
-    if (parent.artLayers[i].name === name) {
-      return parent.artLayers[i];
-    }
-  }
-  // 2) Check layerSets
-  for (var j = 0; j < parent.layerSets.length; j++) {
-    var grp = parent.layerSets[j];
-    if (grp.name === name) return grp;
-    var found = findLayerByNameRecursive(grp, name);
-    if (found) return found;
-  }
-  return null;
-}
-
-// Find the base layer anywhere, then grab the artLayer immediately above it
-function findClippedLayerAbove(baseName) {
-  var result = null;
-  function recurse(container) {
-    // artLayers in this container
-    var al = container.artLayers;
-    for (var i = 0; i < al.length; i++) {
-      if (al[i].name === baseName && i > 0) {
-        result = al[i - 1];
-        return true;
-      }
-    }
-    // dive into groups
-    for (var j = 0; j < container.layerSets.length; j++) {
-      if (recurse(container.layerSets[j])) return true;
-    }
-    return false;
-  }
-  recurse(app.activeDocument);
-  return result;
-}
-
-// Helper to get last hyphen token
+// Helper: get last name token from hyphenated filename
 function getLastName(file) {
-  var base = file.name.replace(/\.[^\.]+$/, "");
-  var parts = base.split("-");
-  return parts.length > 1 ? parts.pop() : base;
+    var nameOnly = file.name.replace(/\.[^\.]+$/, "");
+    var parts = nameOnly.split("-");
+    return parts.length > 1 ? parts.pop() : nameOnly;
 }
 
-if (!app.documents.length) {
-  alert("Open your template PSD first!");
-  throw "No document open.";
+if (app.documents.length == 0) {
+    alert("Open your template PSD first!");
+    throw "No document open.";
 }
 var doc = app.activeDocument;
 
-// --- 1) Players ---
+// --- 1) Players (always run) ---
 for (var p = 0; p < positions.length; p++) {
-  var posName   = positions[p],
-      baseName  = posName + "_base",
-      imgName   = imageFiles[p],
-      file      = new File(desktop + "/PLAYER PF/" + imgName);
+    var posName   = positions[p];
+    var baseName  = posName + "_base";
+    var imageName = imageFiles[p];
+    var inputFile = new File(desktop + '/PLAYER PF/' + imageName);
 
-  if (!file.exists) {
-    alert("Missing player image: " + imgName);
-    continue;
-  }
-  var lastName = getLastName(file);
+    if (!inputFile.exists) {
+        alert("Could not find '" + imageName + "' in 'PLAYER PF' on your Desktop.");
+        continue;
+    }
 
-  // Find the old layer (flat or clipped)
-  var oldLayer = findLayerByNameRecursive(doc, posName)
-              || findClippedLayerAbove(baseName);
-  if (!oldLayer) {
-    alert('Could not find player layer "' + posName + '"');
-    continue;
-  }
-  // record old bounds
-  var b  = oldLayer.bounds,
-      ol = b[0].as("px"), ot = b[1].as("px"),
-      ow = b[2].as("px") - ol, oh = b[3].as("px") - ot;
-  oldLayer.remove();
+    var lastName = getLastName(inputFile);
 
-  // Find the base
-  var base = findLayerByNameRecursive(doc, baseName);
-  if (!base) {
-    alert('Could not find base "' + baseName + '"');
-    continue;
-  }
+    // Find and record the old player layer
+    var targetLayer = null;
+    for (var i = 0; i < doc.layers.length; i++) {
+        if (doc.layers[i].name == posName) {
+            targetLayer = doc.layers[i];
+            break;
+        }
+    }
+    if (!targetLayer) {
+        alert('Could not find layer named "' + posName + '"');
+        continue;
+    }
 
-  // Paste new image
-  var nd = app.open(file);
-  nd.selection.selectAll(); nd.selection.copy();
-  nd.close(SaveOptions.DONOTSAVECHANGES);
-  doc.paste();
-  var nl = doc.activeLayer;
-  nl.name = posName;
-  nl.move(base, ElementPlacement.PLACEBEFORE);
+    // Save original bounds
+    var bounds     = targetLayer.bounds;
+    var origLeft   = bounds[0].as('px');
+    var origTop    = bounds[1].as('px');
+    var origRight  = bounds[2].as('px');
+    var origBottom = bounds[3].as('px');
+    var origWidth  = origRight - origLeft;
+    var origHeight = origBottom - origTop;
 
-  // Resize & reposition
-  var nb = nl.bounds;
-  var scale = Math.min(
-    ow / (nb[2].as("px") - nb[0].as("px")),
-    oh / (nb[3].as("px") - nb[1].as("px"))
-  ) * 100;
-  nl.resize(scale, scale, AnchorPosition.TOPLEFT);
-  var rb = nl.bounds;
-  nl.translate(ol - rb[0].as("px"), ot - rb[1].as("px"));
-  nl.grouped = true;
+    // Remove old layer
+    targetLayer.remove();
 
-  // Update text
-  var txt = findLayerByNameRecursive(doc, posName + "_text");
-  if (txt && txt.kind == LayerKind.TEXT) {
-    txt.textItem.contents = lastName;
-  }
+    // Find base layer
+    var baseLayer = null;
+    for (var j = 0; j < doc.layers.length; j++) {
+        if (doc.layers[j].name == baseName) {
+            baseLayer = doc.layers[j];
+            break;
+        }
+    }
+    if (!baseLayer) {
+        alert('Could not find base layer named "' + baseName + '"');
+        continue;
+    }
+
+    // Open, copy & close new image
+    var newImgDoc = app.open(inputFile);
+    newImgDoc.selection.selectAll();
+    newImgDoc.selection.copy();
+    newImgDoc.close(SaveOptions.DONOTSAVECHANGES);
+
+    // Paste & position
+    doc.paste();
+    var newLayer = doc.activeLayer;
+    newLayer.name = posName;
+    newLayer.move(baseLayer, ElementPlacement.PLACEBEFORE);
+
+    // Resize proportionally
+    var newBounds  = newLayer.bounds;
+    var newWidth   = newBounds[2].as('px') - newBounds[0].as('px');
+    var newHeight  = newBounds[3].as('px') - newBounds[1].as('px');
+    var scaleRatio = Math.min(origWidth / newWidth, origHeight / newHeight) * 100;
+    newLayer.resize(scaleRatio, scaleRatio, AnchorPosition.TOPLEFT);
+
+    // Reposition
+    var resizedBounds = newLayer.bounds;
+    var resizedLeft   = resizedBounds[0].as('px');
+    var resizedTop    = resizedBounds[1].as('px');
+    newLayer.translate(origLeft - resizedLeft, origTop - resizedTop);
+
+    // Apply clipping mask
+    newLayer.grouped = true;
+
+    // Update text layer
+    var textName  = posName + "_text";
+    var textLayer = null;
+    for (var t = 0; t < doc.layers.length; t++) {
+        if (doc.layers[t].name == textName) {
+            textLayer = doc.layers[t];
+            break;
+        }
+    }
+    if (textLayer && textLayer.kind == LayerKind.TEXT) {
+        textLayer.textItem.contents = lastName;
+    }
 }
 
-// --- 2) Teams ---
-for (var p = 0; p < positions.length; p++) {
-  var posName   = positions[p],
-      layerName = posName + "_team",
-      baseName  = posName + "_team_base",
-      imgName   = teamFiles[p],
-      file      = new File(desktop + "/TEAMS/" + imgName);
+// --- 2) Teams (only if enabled) ---
+if (teamFiles.length > 0) {
+    for (var p = 0; p < positions.length; p++) {
+        var posName   = positions[p];
+        var baseName  = posName + "_team_base";
+        var imageName = teamFiles[p];
+        var inputFile = new File(desktop + '/TEAMS/' + imageName);
 
-  if (!file.exists) {
-    alert("Missing team badge: " + imgName);
-    continue;
-  }
+        if (!inputFile.exists) {
+            alert("Could not find '" + imageName + "' in 'TEAMS' on your Desktop.");
+            continue;
+        }
 
-  var oldLayer = findLayerByNameRecursive(doc, layerName)
-              || findClippedLayerAbove(baseName);
-  if (!oldLayer) {
-    alert('Could not find team layer "' + layerName + '"');
-    continue;
-  }
-  var b  = oldLayer.bounds,
-      ol = b[0].as("px"), ot = b[1].as("px"),
-      ow = b[2].as("px") - ol, oh = b[3].as("px") - ot;
-  oldLayer.remove();
+        var layerName   = posName + "_team";
+        var targetLayer = null;
+        for (var i = 0; i < doc.layers.length; i++) {
+            if (doc.layers[i].name == layerName) {
+                targetLayer = doc.layers[i];
+                break;
+            }
+        }
+        if (!targetLayer) {
+            alert('Could not find layer named "' + layerName + '"');
+            continue;
+        }
 
-  var base = findLayerByNameRecursive(doc, baseName);
-  if (!base) {
-    alert('Could not find team base "' + baseName + '"');
-    continue;
-  }
+        var bounds     = targetLayer.bounds;
+        var origLeft   = bounds[0].as('px');
+        var origTop    = bounds[1].as('px');
+        var origRight  = bounds[2].as('px');
+        var origBottom = bounds[3].as('px');
+        var origWidth  = origRight - origLeft;
+        var origHeight = origBottom - origTop;
 
-  var nd = app.open(file);
-  nd.selection.selectAll(); nd.selection.copy();
-  nd.close(SaveOptions.DONOTSAVECHANGES);
-  doc.paste();
-  var nl = doc.activeLayer;
-  nl.name = layerName;
-  nl.move(base, ElementPlacement.PLACEBEFORE);
+        targetLayer.remove();
 
-  var nb = nl.bounds;
-  var scale = Math.min(
-    ow / (nb[2].as("px") - nb[0].as("px")),
-    oh / (nb[3].as("px") - nb[1].as("px"))
-  ) * 100;
-  nl.resize(scale, scale, AnchorPosition.TOPLEFT);
-  var rb = nl.bounds;
-  nl.translate(ol - rb[0].as("px"), ot - rb[1].as("px"));
-  nl.grouped = true;
+        var baseLayer = null;
+        for (var j = 0; j < doc.layers.length; j++) {
+            if (doc.layers[j].name == baseName) {
+                baseLayer = doc.layers[j];
+                break;
+            }
+        }
+        if (!baseLayer) {
+            alert('Could not find base layer named "' + baseName + '"');
+            continue;
+        }
+
+        var newDoc = app.open(inputFile);
+        newDoc.selection.selectAll();
+        newDoc.selection.copy();
+        newDoc.close(SaveOptions.DONOTSAVECHANGES);
+
+        doc.paste();
+        var newLayer = doc.activeLayer;
+        newLayer.name = layerName;
+        newLayer.move(baseLayer, ElementPlacement.PLACEBEFORE);
+
+        var nb         = newLayer.bounds;
+        var badgeWidth = nb[2].as('px') - nb[0].as('px');
+        var badgeHeight= nb[3].as('px') - nb[1].as('px');
+        var scaleBadge = Math.min(origWidth / badgeWidth, origHeight / badgeHeight) * 100;
+        newLayer.resize(scaleBadge, scaleBadge, AnchorPosition.TOPLEFT);
+
+        var rbLeft = newLayer.bounds[0].as('px'),
+            rbTop  = newLayer.bounds[1].as('px');
+        newLayer.translate(origLeft - rbLeft, origTop - rbTop);
+
+        newLayer.grouped = true;
+    }
 }
 
-// --- 3) Nations ---
-for (var p = 0; p < positions.length; p++) {
-  var posName   = positions[p],
-      layerName = posName + "_nation",
-      baseName  = posName + "_nation_base",
-      imgName   = nationFiles[p],
-      file      = new File(desktop + "/NATIONS/" + imgName);
+// --- 3) Nations (only if enabled) ---
+if (nationFiles.length > 0) {
+    for (var p = 0; p < positions.length; p++) {
+        var posName   = positions[p];
+        var baseName  = posName + "_nation_base";
+        var imageName = nationFiles[p];
+        var inputFile = new File(desktop + '/NATIONS/' + imageName);
 
-  if (!file.exists) {
-    alert("Missing flag: " + imgName);
-    continue;
-  }
+        if (!inputFile.exists) {
+            alert("Could not find '" + imageName + "' in 'NATIONS' on your Desktop.");
+            continue;
+        }
 
-  var oldLayer = findLayerByNameRecursive(doc, layerName)
-              || findClippedLayerAbove(baseName);
-  if (!oldLayer) {
-    alert('Could not find nation layer "' + layerName + '"');
-    continue;
-  }
-  var b  = oldLayer.bounds,
-      ol = b[0].as("px"), ot = b[1].as("px"),
-      ow = b[2].as("px") - ol, oh = b[3].as("px") - ot;
-  oldLayer.remove();
+        var layerName   = posName + "_nation";
+        var targetLayer = null;
+        for (var i = 0; i < doc.layers.length; i++) {
+            if (doc.layers[i].name == layerName) {
+                targetLayer = doc.layers[i];
+                break;
+            }
+        }
+        if (!targetLayer) {
+            alert('Could not find layer named "' + layerName + '"');
+            continue;
+        }
 
-  var base = findLayerByNameRecursive(doc, baseName);
-  if (!base) {
-    alert('Could not find nation base "' + baseName + '"');
-    continue;
-  }
+        var bounds     = targetLayer.bounds;
+        var origLeft   = bounds[0].as('px');
+        var origTop    = bounds[1].as('px');
+        var origRight  = bounds[2].as('px');
+        var origBottom = bounds[3].as('px');
+        var origWidth  = origRight - origLeft;
+        var origHeight = origBottom - origTop;
 
-  var nd = app.open(file);
-  nd.selection.selectAll(); nd.selection.copy();
-  nd.close(SaveOptions.DONOTSAVECHANGES);
-  doc.paste();
-  var nl = doc.activeLayer;
-  nl.name = layerName;
-  nl.move(base, ElementPlacement.PLACEBEFORE);
+        targetLayer.remove();
 
-  var nb = nl.bounds;
-  var scale = Math.min(
-    ow / (nb[2].as("px") - nb[0].as("px")),
-    oh / (nb[3].as("px") - nb[1].as("px"))
-  ) * 100;
-  nl.resize(scale, scale, AnchorPosition.TOPLEFT);
-  var rb = nl.bounds;
-  nl.translate(ol - rb[0].as("px"), ot - rb[1].as("px"));
-  nl.grouped = true;
+        var baseLayer = null;
+        for (var j = 0; j < doc.layers.length; j++) {
+            if (doc.layers[j].name == baseName) {
+                baseLayer = doc.layers[j];
+                break;
+            }
+        }
+        if (!baseLayer) {
+            alert('Could not find base layer named "' + baseName + '"');
+            continue;
+        }
+
+        var newDoc = app.open(inputFile);
+        newDoc.selection.selectAll();
+        newDoc.selection.copy();
+        newDoc.close(SaveOptions.DONOTSAVECHANGES);
+
+        doc.paste();
+        var newLayer = doc.activeLayer;
+        newLayer.name = layerName;
+        newLayer.move(baseLayer, ElementPlacement.PLACEBEFORE);
+
+        var nb       = newLayer.bounds;
+        var flagWidth= nb[2].as('px') - nb[0].as('px');
+        var flagHeight= nb[3].as('px') - nb[1].as('px');
+        var scaleFlag= Math.min(origWidth / flagWidth, origHeight / flagHeight) * 100;
+        newLayer.resize(scaleFlag, scaleFlag, AnchorPosition.TOPLEFT);
+
+        var rbLeft = newLayer.bounds[0].as('px'),
+            rbTop  = newLayer.bounds[1].as('px');
+        newLayer.translate(origLeft - rbLeft, origTop - rbTop);
+
+        newLayer.grouped = true;
+    }
 }
 
-alert("All 11 positions, teams & nations have been updated!");
+alert("All 11 positions updated!");
