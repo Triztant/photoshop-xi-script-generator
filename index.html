@@ -4,158 +4,207 @@
   <meta charset="UTF-8"/>
   <title>Squad → Photoshop XI Script</title>
   <style>
-    body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: #e6ecf2; margin: 0; }
-    .card { background: #f4f6f8; padding: 1rem; border-radius: 14px;
-            box-shadow: 6px 6px 18px rgba(0,0,0,0.05), -6px -6px 18px rgba(255,255,255,0.8);
-            width: 85%; max-width: 340px; }
-    h1 { text-align: center; margin-bottom: 1rem; font-family: Arial, sans-serif; font-size: 1.4rem; color: #222; }
-    form { display: flex; flex-direction: column; }
-    .dropdown-field { margin-bottom: 0.8rem; }
-    .dropdown-field label { display: block; font-size: 0.95rem; font-weight: 500; margin-bottom: 0.3rem; color: #555; }
-    .dropdown-field input {
-      width: 100%; padding: 0.8rem; font-size: 1.1rem; font-weight: 600; color: #333;
-      background: #f4f6f8; border: none; border-radius: 10px;
-      box-shadow: inset 3px 3px 6px rgba(0,0,0,0.05), inset -3px -3px 6px rgba(255,255,255,0.8);
-      box-sizing: border-box;
-    }
-    .dropdown-field input:focus {
-      outline: none;
-      box-shadow: inset 2px 2px 4px rgba(0,94,252,0.25), inset -2px -2px 4px rgba(255,255,255,0.8);
-    }
-    button {
-      padding: 0.75rem; font-size: 1rem; background: #005efc; color: #fff;
-      border: none; border-radius: 8px; cursor: pointer; margin-top: 1rem;
-      box-shadow: 3px 3px 10px rgba(0,94,252,0.2), -3px -3px 10px rgba(255,255,255,0.5);
-      transition: background 0.2s ease-in-out;
-    }
-    button:hover { background: #0041b3; }
+    /* …your existing styles… */
   </style>
 </head>
 <body>
   <div class="card">
     <h1>Pick Your 11 (4-4-2)</h1>
+    <!-- novalidate disables built-in required checks -->
     <form id="squadForm" novalidate>
       <datalist id="namesList"></datalist>
       <datalist id="teamsList"></datalist>
       <datalist id="nationsList"></datalist>
 
-      <!-- Row 1: GK -->
+       <!-- Row 1: GK -->
       <div class="dropdown-field">
         <label for="player1">GK</label>
-        <input list="namesList" id="player1" name="player" placeholder="Type a name…" required>
+        <input list="namesList"   id="player1" name="player"  placeholder="Type a name…" required>
       </div>
       <div class="dropdown-field">
         <label for="team1">GK_Team</label>
-        <input list="teamsList" id="team1" name="team" placeholder="Type a team…" required>
+        <input list="teamsList"   id="team1"   name="team"    placeholder="Type a team…" required>
       </div>
       <div class="dropdown-field">
         <label for="nation1">GK_Nation</label>
-        <input list="nationsList" id="nation1" name="nation" placeholder="Type a nation…" required>
+        <input list="nationsList" id="nation1" name="nation"  placeholder="Type a nation…" required>
       </div>
 
       <!-- Row 2: LB -->
       <div class="dropdown-field">
         <label for="player2">LB</label>
-        <input list="namesList" id="player2" name="player" placeholder="Type a name…" required>
+        <input list="namesList"   id="player2" name="player"  placeholder="Type a name…" required>
       </div>
       <div class="dropdown-field">
         <label for="team2">LB_Team</label>
-        <input list="teamsList" id="team2" name="team" placeholder="Type a team…" required>
+        <input list="teamsList"   id="team2"   name="team"    placeholder="Type a team…" required>
       </div>
       <div class="dropdown-field">
         <label for="nation2">LB_Nation</label>
-        <input list="nationsList" id="nation2" name="nation" placeholder="Type a nation…" required>
+        <input list="nationsList" id="nation2" name="nation"  placeholder="Type a nation…" required>
       </div>
 
       <!-- Row 3: LCB -->
       <div class="dropdown-field">
         <label for="player3">LCB</label>
-        <input list="namesList" id="player3" name="player" placeholder="Type a name…" required>
+        <input list="namesList"   id="player3" name="player"  placeholder="Type a name…" required>
       </div>
       <div class="dropdown-field">
         <label for="team3">LCB_Team</label>
-        <input list="teamsList" id="team3" name="team" placeholder="Type a team…" required>
+        <input list="teamsList"   id="team3"   name="team"    placeholder="Type a team…" required>
       </div>
       <div class="dropdown-field">
         <label for="nation3">LCB_Nation</label>
-        <input list="nationsList" id="nation3" name="nation" placeholder="Type a nation…" required>
+        <input list="nationsList" id="nation3" name="nation"  placeholder="Type a nation…" required>
       </div>
 
       <!-- Row 4: RCB -->
       <div class="dropdown-field">
         <label for="player4">RCB</label>
-        <input list="namesList" id="player4" name="player" placeholder="Type a name…" required>
+        <input list="namesList"   id="player4" name="player"  placeholder="Type a name…" required>
       </div>
       <div class="dropdown-field">
         <label for="team4">RCB_Team</label>
-        <input list="teamsList" id="team4" name="team" placeholder="Type a team…" required>
+        <input list="teamsList"   id="team4"   name="team"    placeholder="Type a team…" required>
       </div>
       <div class="dropdown-field">
         <label for="nation4">RCB_Nation</label>
-        <input list="nationsList" id="nation4" name="nation" placeholder="Type a nation…" required>
+        <input list="nationsList" id="nation4" name="nation"  placeholder="Type a nation…" required>
       </div>
 
       <!-- Row 5: RB -->
       <div class="dropdown-field">
         <label for="player5">RB</label>
-        <input list="namesList" id="player5" name="player" placeholder="Type a name…" required>
+        <input list="namesList"   id="player5" name="player"  placeholder="Type a name…" required>
       </div>
       <div class="dropdown-field">
         <label for="team5">RB_Team</label>
-        <input list="teamsList" id="team5" name="team" placeholder="Type a team…" required>
+        <input list="teamsList"   id="team5"   name="team"    placeholder="Type a team…" required>
       </div>
       <div class="dropdown-field">
         <label for="nation5">RB_Nation</label>
-        <input list="nationsList" id="nation5" name="nation" placeholder="Type a nation…" required>
+        <input list="nationsList" id="nation5" name="nation"  placeholder="Type a nation…" required>
       </div>
 
       <!-- Row 6: RCM -->
       <div class="dropdown-field">
         <label for="player6">RCM</label>
-        <input list="namesList" id="player6" name="player" placeholder="Type a name…" required>
+        <input list="namesList"   id="player6" name="player"  placeholder="Type a name…" required>
       </div>
       <div class="dropdown-field">
         <label for="team6">RCM_Team</label>
-        <input list="teamsList" id="team6" name="team" placeholder="Type a team…" required>
+        <input list="teamsList"   id="team6"   name="team"    placeholder="Type a team…" required>
       </div>
       <div class="dropdown-field">
         <label for="nation6">RCM_Nation</label>
-        <input list="nationsList" id="nation6" name="nation" placeholder="Type a nation…" required>
+        <input list="nationsList" id="nation6" name="nation"  placeholder="Type a nation…" required>
       </div>
 
       <!-- Row 7: LCM -->
       <div class="dropdown-field">
         <label for="player7">LCM</label>
-        <input list="namesList" id="player7" name="player" placeholder="Type a name…" required>
+        <input list="namesList"   id="player7" name="player"  placeholder="Type a name…" required>
       </div>
       <div class="dropdown-field">
         <label for="team7">LCM_Team</label>
-        <input list="teamsList" id="team7" name="team" placeholder="Type a team…" required>
+        <input list="teamsList"   id="team7"   name="team"    placeholder="Type a team…" required>
       </div>
       <div class="dropdown-field">
         <label for="nation7">LCM_Nation</label>
-        <input list="nationsList" id="nation7" name="nation" placeholder="Type a nation…" required>
+        <input list="nationsList" id="nation7" name="nation"  placeholder="Type a nation…" required>
       </div>
 
       <!-- Row 8: CM -->
       <div class="dropdown-field">
         <label for="player8">CM</label>
-        <input list="namesList" id="player8" name="player" placeholder="Type a name…" required>
+        <input list="namesList"   id="player8" name="player"  placeholder="Type a name…" required>
       </div>
       <div class="dropdown-field">
         <label for="team8">CM_Team</label>
-        <input list="teamsList" id="team8" name="team" placeholder="Type a team…" required>
+        <input list="teamsList"   id="team8"   name="team"    placeholder="Type a team…" required>
       </div>
       <div class="dropdown-field">
         <label for="nation8">CM_Nation</label>
-        <input list="nationsList" id="nation8" name="nation" placeholder="Type a nation…" required>
+        <input list="nationsList" id="nation8" name="nation"  placeholder="Type a nation…" required>
       </div>
 
       <!-- Row 9: LW -->
       <div class="dropdown-field">
         <label for="player9">LW</label>
-        <input list="namesList" id="player9" name="player" placeholder="Type a name…" required>
+        <input list="namesList"   id="player9" name="player"  placeholder="Type a name…" required>
       </div>
       <div class="dropdown-field">
         <label for="team9">LW_Team</label>
-        <input list="teamsList" id="team9" name="team" placeholder="Type a team…" required>
+        <input list="teamsList"   id="team9"   name="team"    placeholder="Type a team…" required>
+      </div>
+      <div class="dropdown-field">
+        <label for="nation9">LW_Nation</label>
+        <input list="nationsList" id="nation9" name="nation"  placeholder="Type a nation…" required>
+      </div>
+
+      <!-- Row 10: ST -->
+      <div class="dropdown-field">
+        <label for="player10">ST</label>
+        <input list="namesList"   id="player10" name="player" placeholder="Type a name…" required>
+      </div>
+      <div class="dropdown-field">
+        <label for="team10">ST_Team</label>
+        <input list="teamsList"   id="team10"   name="team"   placeholder="Type a team…" required>
+      </div>
+      <div class="dropdown-field">  
+        <label for="nation10">ST_Nation</label>
+        <input list="nationsList" id="nation10" name="nation" placeholder="Type a nation…" required>
+      </div>
+
+      <!-- Row 11: RW -->
+      <div class="dropdown-field">
+        <label for="player11">RW</label>
+        <input list="namesList"   id="player11" name="player" placeholder="Type a name…" required>
+      </div>
+      <div class="dropdown-field">
+        <label for="team11">RW_Team</label>
+        <input list="teamsList"   id="team11"   name="team"   placeholder="Type a team…" required>
+      </div>
+      <div class="dropdown-field">
+        <label for="nation11">RW_Nation</label>
+        <input list="nationsList" id="nation11" name="nation" placeholder="Type a nation…" required>
+      </div>
+
+      <!-- Toggles -->
+      <div style="margin: .5rem 0; display: flex; justify-content: space-between;">
+        <label><input type="checkbox" id="chkTeams"   checked> Include Teams</label>
+        <label><input type="checkbox" id="chkNations" checked> Include Nations</label>
+      </div>
+
+      <button type="submit">Generate &amp; Download .jsx</button>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Show/hide team or nation fields and adjust 'required'
+    function toggleFields(name, show) {
+      document.querySelectorAll(`input[name="${name}"]`).forEach(input => {
+        // hide or show
+        input.closest('.dropdown-field').style.display = show ? '' : 'none';
+        // only require when visible
+        input.required = show;
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Initial state
+      toggleFields('team',   document.getElementById('chkTeams').checked);
+      toggleFields('nation', document.getElementById('chkNations').checked);
+
+      // On toggle change
+      document.getElementById('chkTeams').addEventListener('change', e => {
+        toggleFields('team', e.target.checked);
+      });
+      document.getElementById('chkNations').addEventListener('change', e => {
+        toggleFields('nation', e.target.checked);
+      });
+    });
+  </script>
+</body>
+</html>
