@@ -17,37 +17,24 @@ Promise.all([
   const dlTeams = document.getElementById('teamsList');
   const dlNats  = document.getElementById('nationsList');
 
-  names.forEach(v => {
-    const o = document.createElement('option');
-    o.value = v;
-    dlNames.appendChild(o);
-  });
-  teams.forEach(v => {
-    const o = document.createElement('option');
-    o.value = v;
-    dlTeams.appendChild(o);
-  });
-  nations.forEach(v => {
-    const o = document.createElement('option');
-    o.value = v;
-    dlNats.appendChild(o);
-  });
+  names  .forEach(v => { const o = document.createElement('option'); o.value = v; dlNames.appendChild(o); });
+  teams  .forEach(v => { const o = document.createElement('option'); o.value = v; dlTeams.appendChild(o); });
+  nations.forEach(v => { const o = document.createElement('option'); o.value = v; dlNats.appendChild(o); });
 });
 
-// Handle form submission: build filename arrays, inject into the template, and download the .jsx
+// Handle form submission: collect values, build filename arrays, inject & download .jsx
 document.getElementById('squadForm').addEventListener('submit', e => {
   e.preventDefault();
 
-  // Helper: collect 11 values for a given input name
+  // Collect exactly 11 of each
   const collect = name =>
     Array.from(document.querySelectorAll(`input[name="${name}"]`))
          .map(i => i.value.trim());
 
-  const P = collect('player');   // 11 player names
-  const T = collect('team');     // 11 team names
-  const N = collect('nation');   // 11 nation names
+  const P = collect('player');  // e.g. ["Declan Rice", ...]
+  const T = collect('team');    // e.g. ["Liverpool FC", ...]
+  const N = collect('nation');  // e.g. ["United Kingdom", ...]
 
-  // Validate
   if (P.length !== 11 || T.length !== 11 || N.length !== 11) {
     return alert('Please fill exactly 11 players, 11 teams, and 11 nations.');
   }
@@ -57,12 +44,12 @@ document.getElementById('squadForm').addEventListener('submit', e => {
     P.map(nm => `"${nm.toLowerCase().replace(/\s+/g, '-')}.png"`).join(',') +
     ']';
 
-  // Build teamFiles array (exact + .png)
+  // Build teamFiles array (exact + ".png")
   const teamArr = '[' +
     T.map(nm => `"${nm}.png"`).join(',') +
     ']';
 
-  // Build nationFiles array (exact + .png)
+  // Build nationFiles array (exact + ".png")
   const natArr = '[' +
     N.map(nm => `"${nm}.png"`).join(',') +
     ']';
@@ -73,7 +60,7 @@ document.getElementById('squadForm').addEventListener('submit', e => {
     .replace(/{{\s*TEAM_FILES\s*}}/,  teamArr)
     .replace(/{{\s*NATION_FILES\s*}}/, natArr);
 
-  // Trigger download of the generated .jsx
+  // Download the generated .jsx
   const blob = new Blob([js], { type: 'application/javascript' });
   const url  = URL.createObjectURL(blob);
   const a    = document.createElement('a');
