@@ -82,25 +82,25 @@
   <div class="card">
     <h1>Pick Your 11 (4-4-2)</h1>
     <form id="squadForm">
+      <!-- Autocomplete sources -->
       <datalist id="namesList"></datalist>
       <datalist id="teamsList"></datalist>
       <datalist id="nationsList"></datalist>
 
-      <!-- JS will inject 11 rows here -->
+      <!-- Container for the 11 rows -->
       <div id="inputs"></div>
 
       <button type="submit">Generate &amp; Download .jsx</button>
     </form>
   </div>
 
+  <!-- Inject the 11 rows of inputs -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // Exactly these 11 positions—no duplicates
       const positions = [
         "GK", "LB", "LCB", "RCB", "RB",
         "RCM", "LCM", "CM", "LW", "ST", "RW"
       ];
-
       const inputsDiv = document.getElementById('inputs');
 
       positions.forEach(pos => {
@@ -108,13 +108,11 @@
         row.className = 'row';
 
         ['player','team','nation'].forEach(type => {
-          const wrapper = document.createElement('div');
-
+          const wrap = document.createElement('div');
           const label = document.createElement('label');
           label.textContent = type === 'player'
                             ? pos
                             : `${pos}_${type.charAt(0).toUpperCase() + type.slice(1)}`;
-
           const input = document.createElement('input');
           input.setAttribute('list',
             type === 'player' ? 'namesList'
@@ -125,8 +123,8 @@
           input.placeholder = `Type a ${type}…`;
           input.required = true;
 
-          wrapper.append(label, input);
-          row.appendChild(wrapper);
+          wrap.append(label, input);
+          row.appendChild(wrap);
         });
 
         inputsDiv.appendChild(row);
