@@ -7,12 +7,12 @@ var positions = [
   "RCM", "LCM", "CM", "LW", "ST", "RW"
 ];
 
-// Filenames injected by the web UI
-var imageFiles  = {{IMAGE_FILES}};   // e.g. ["player-one.png", …]
-var teamFiles   = {{TEAM_FILES}};    // e.g. ["TEAM_ONE.png", …]
-var nationFiles = {{NATION_FILES}};  // e.g. ["Flag_of_Country.png", …]
+// Web UI will replace these placeholders with real arrays:
+var imageFiles  = {{IMAGE_FILES}};   // ["player-one.png",  …]
+var teamFiles   = {{TEAM_FILES}};    // ["TEAM_ONE.png",    …]
+var nationFiles = {{NATION_FILES}};  // ["Flag_of_England_Flat_Round-256x256.png", …]
 
-// Helper to extract the last hyphen-delimited token from a filename
+// Helper to pull the last hyphenated token from filename → text
 function getLastName(file) {
     var base = file.name.replace(/\.[^\.]+$/, "");
     var parts = base.split("-");
@@ -25,7 +25,7 @@ if (!app.documents.length) {
 }
 var doc = app.activeDocument;
 
-// --- 1) Replace Player Images & Text ---
+// 1) Replace player images & text
 for (var i = 0; i < positions.length; i++) {
     var posName   = positions[i],
         baseName  = posName + "_base",
@@ -37,11 +37,12 @@ for (var i = 0; i < positions.length; i++) {
         continue;
     }
 
-    var lastName = getLastName(inputFile);
-    var layer    = doc.layers.byName(posName);
-    var b        = layer.bounds;
-    var ol = b[0].as("px"), ot = b[1].as("px"),
+    var lastName = getLastName(inputFile),
+        layer    = doc.layers.byName(posName),
+        b        = layer.bounds,
+        ol = b[0].as("px"), ot = b[1].as("px"),
         ow = b[2].as("px") - ol, oh = b[3].as("px") - ot;
+
     layer.remove();
 
     var base = doc.layers.byName(baseName);
@@ -66,13 +67,14 @@ for (var i = 0; i < positions.length; i++) {
     nl.translate(ol - rb[0].as("px"), ot - rb[1].as("px"));
     nl.grouped = true;
 
+    // update text
     var txt = doc.layers.byName(posName + "_text");
-    if (txt.kind == LayerKind.TEXT) {
+    if (txt && txt.kind == LayerKind.TEXT) {
         txt.textItem.contents = lastName;
     }
 }
 
-// --- 2) Replace Team Badges ---
+// 2) Replace team badges
 for (var i = 0; i < positions.length; i++) {
     var posName   = positions[i],
         baseName  = posName + "_team_base",
@@ -84,11 +86,12 @@ for (var i = 0; i < positions.length; i++) {
         continue;
     }
 
-    var layerName = posName + "_team";
-    var layer     = doc.layers.byName(layerName);
-    var b         = layer.bounds;
-    var ol = b[0].as("px"), ot = b[1].as("px"),
+    var layerName = posName + "_team",
+        layer     = doc.layers.byName(layerName),
+        b         = layer.bounds,
+        ol = b[0].as("px"), ot = b[1].as("px"),
         ow = b[2].as("px") - ol, oh = b[3].as("px") - ot;
+
     layer.remove();
 
     var base = doc.layers.byName(baseName);
@@ -114,7 +117,7 @@ for (var i = 0; i < positions.length; i++) {
     nl.grouped = true;
 }
 
-// --- 3) Replace National Flags ---
+// 3) Replace national flags
 for (var i = 0; i < positions.length; i++) {
     var posName   = positions[i],
         baseName  = posName + "_nation_base",
@@ -126,11 +129,12 @@ for (var i = 0; i < positions.length; i++) {
         continue;
     }
 
-    var layerName = posName + "_nation";
-    var layer     = doc.layers.byName(layerName);
-    var b         = layer.bounds;
-    var ol = b[0].as("px"), ot = b[1].as("px"),
+    var layerName = posName + "_nation",
+        layer     = doc.layers.byName(layerName),
+        b         = layer.bounds,
+        ol = b[0].as("px"), ot = b[1].as("px"),
         ow = b[2].as("px") - ol, oh = b[3].as("px") - ot;
+
     layer.remove();
 
     var base = doc.layers.byName(baseName);
