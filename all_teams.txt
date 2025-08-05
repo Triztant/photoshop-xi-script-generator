@@ -1,0 +1,288 @@
+1.FC Union Berlin
+AA Argentinos Juniors
+AC Milan
+ACF Fiorentina
+AFC Bournemouth
+AJ Auxerre
+AS Monaco
+AS Roma
+AZ Alkmaar
+Ajax Amsterdam
+Al-Ahli SFC
+Al-Ettifaq FC
+Al-Fateh SC
+Al-Fayha FC
+Al-Hazem SC
+Al-Hilal SFC
+Al-Ittihad Club
+Al-Khaleej FC
+Al-Kholood Club
+Al-Najma SC
+Al-Nassr FC
+Al-Okhdood Club
+Al-Qadsiah FC
+Al-Riyadh SC
+Al-Shabab FC
+Al-Taawoun FC
+Alanyaspor
+Angers SCO
+Antalyaspor
+Arsenal FC
+Aston Villa
+Atalanta BC
+Athletic Bilbao
+Atlanta United FC
+Atlético de Madrid
+Austin FC
+Avs Futebol
+Basaksehir FK
+Bayer 04 Leverkusen
+Bayern Munich
+Besiktas JK
+Birmingham City
+Blackburn Rovers
+Bologna FC 1909
+Borussia Dortmund
+Borussia Mönchengladbach
+Botafogo de Futebol e Regatas
+Brentford FC
+Brighton & Hove Albion
+Bristol City
+Burnley FC
+CA Aldosivi
+CA Banfield
+CA Barracas Central
+CA Boca Juniors
+CA Central Córdoba (SdE)
+CA Huracán
+CA Independiente
+CA Lanús
+CA Newell's Old Boys
+CA Osasuna
+CA River Plate
+CA Rosario Central
+CA San Lorenzo de Almagro
+CA San Martín (San Juan)
+CA Sarmiento (Junin)
+CA Talleres
+CA Unión (Santa Fe)
+CA Vélez Sarsfield
+CD Godoy Cruz Antonio Tomba
+CD Nacional
+CD Santa Clara
+CD Tondela
+CF Estrela Amadora
+CF Montréal
+CR Flamengo
+CS Independiente Rivadavia
+Cagliari Calcio
+Casa Pia AC
+Caykur Rizespor
+Ceará Sporting Club
+Celta de Vigo
+Cercle Brugge
+Charlotte FC
+Charlton Athletic
+Chelsea FC
+Chicago Fire FC
+Club Atlético Belgrano
+Club Atlético Platense
+Club Atlético Tigre
+Club Atlético Tucumán
+Club Brugge KV
+Club Deportivo Riestra
+Club Estudiantes de La Plata
+Club de Gimnasia y Esgrima La Plata
+Clube Atlético Mineiro
+Clube de Regatas Vasco da Gama
+Colorado Rapids
+Columbus Crew
+Como 1907
+Coventry City
+Cruzeiro Esporte Clube
+Crystal Palace
+D.C. United
+Damac FC
+Defensa y Justicia
+Deportivo Alavés
+Derby County
+Eintracht Frankfurt
+Elche CF
+Esporte Clube Bahia
+Esporte Clube Juventude
+Esporte Clube Vitória
+Everton FC
+Excelsior Rotterdam
+Eyüpspor
+FC Alverca
+FC Arouca
+FC Augsburg
+FC Barcelona
+FC Cincinnati
+FC Dallas
+FC Famalicão
+FC Groningen
+FC Heidenheim 1846
+FC Köln
+FC Lorient
+FC Metz
+FC Nantes
+FC Porto
+FC St. Pauli
+FC Toulouse
+FC Utrecht
+FC Volendam
+FCV Dender EH
+FSV Mainz 05
+Fatih Karagümrük
+Fenerbahce
+Feyenoord Rotterdam
+Fluminense Football Club
+Fortaleza Esporte Clube
+Fortuna Sittard
+Fulham FC
+GD Estoril Praia
+Galatasaray
+Gaziantep FK
+Genclerbirligi Ankara
+Genoa CFC
+Getafe CF
+Gil Vicente FC
+Girona FC
+Go Ahead Eagles
+Grêmio Foot-Ball Porto Alegrense
+Göztepe
+Hamburger SV
+Hellas Verona
+Heracles Almelo
+Houston Dynamo FC
+Hull City
+Instituto ACC
+Inter Miami CF
+Inter Milan
+Ipswich Town
+Juventus FC
+KAA Gent
+KRC Genk
+KV Mechelen
+KVC Westerlo
+Kasimpasa
+Kayserispor
+Kocaelispor
+Konyaspor
+LOSC Lille
+Le Havre AC
+Leeds United
+Leicester City
+Levante UD
+Liverpool FC
+Los Angeles FC
+Los Angeles Galaxy
+Manchester City
+Manchester United
+Middlesbrough FC
+Millwall FC
+Minnesota United FC
+Mirassol Futebol Clube (SP)
+Moreirense FC
+NAC Breda
+NEC Nijmegen
+NEOM SC
+Nashville SC
+New England Revolution
+New York City FC
+New York Red Bulls
+Newcastle United
+Norwich City
+Nottingham Forest
+OGC Nice
+Olympique Lyon
+Olympique Marseille
+Orlando City SC
+Oud-Heverlee Leuven
+Oxford United
+PEC Zwolle
+PSV Eindhoven
+Paris FC
+Paris Saint-Germain
+Parma Calcio 1913
+Philadelphia Union
+Pisa Sporting Club
+Portland Timbers
+Portsmouth FC
+Preston North End
+Queens Park Rangers
+RAAL La Louvière
+RB Leipzig
+RC Lens
+RC Strasbourg Alsace
+RCD Espanyol Barcelona
+RCD Mallorca
+RSC Anderlecht
+Racing Club
+Rayo Vallecano
+Real Betis Balompié
+Real Madrid
+Real Oviedo
+Real Salt Lake City
+Real Sociedad
+Red Bull Bragantino
+Rio Ave FC
+Royal Antwerp FC
+Royal Charleroi SC
+SC Braga
+SC Freiburg
+SC Heerenveen
+SC Telstar
+SL Benfica
+SS Lazio
+SSC Napoli
+SV Werder Bremen
+Samsunspor
+San Diego FC
+San Jose Earthquakes
+Santos FC
+Seattle Sounders FC
+Sevilla FC
+Sheffield United
+Sheffield Wednesday
+Sint-Truidense VV
+Sociedade Esportiva Palmeiras
+Southampton FC
+Sparta Rotterdam
+Sport Club Corinthians Paulista
+Sport Club Internacional
+Sport Club do Recife
+Sporting CP
+Sporting Kansas City
+St. Louis CITY SC
+Stade Brestois 29
+Stade Rennais FC
+Standard Liège
+Stoke City
+Sunderland AFC
+Swansea City
+São Paulo Futebol Clube
+TSG 1899 Hoffenheim
+Torino FC
+Toronto FC
+Tottenham Hotspur
+Trabzonspor
+Twente Enschede FC
+US Cremonese
+US Lecce
+US Sassuolo
+Udinese Calcio
+Union Saint-Gilloise
+Valencia CF
+Vancouver Whitecaps FC
+VfB Stuttgart
+VfL Wolfsburg
+Villarreal CF
+Vitória Guimarães SC
+Watford FC
+West Bromwich Albion
+West Ham United
+Wolverhampton Wanderers
+Wrexham AFC
+Zulte Waregem
