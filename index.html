@@ -14,10 +14,10 @@
     }
     .card {
       background: #f4f6f8;
-      padding: 1rem;
+      padding: 1.5rem;
       border-radius: 14px;
       box-shadow: 6px 6px 18px rgba(0,0,0,0.05), -6px -6px 18px rgba(255,255,255,0.8);
-      width: 85%;
+      width: 90%;
       max-width: 360px;
     }
     h1 {
@@ -30,24 +30,24 @@
     form {
       display: flex;
       flex-direction: column;
+      gap: 1rem;
     }
     .row {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr;
       gap: 0.5rem;
-      margin-bottom: 0.8rem;
     }
     .row label {
       display: block;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 500;
       color: #555;
       margin-bottom: 0.3rem;
     }
     .row input {
       width: 100%;
-      padding: 0.8rem 1rem;
-      font-size: 1.1rem;
+      padding: 0.75rem;
+      font-size: 1rem;
       font-weight: 600;
       color: #333;
       background: #f4f6f8;
@@ -63,7 +63,7 @@
                   inset -2px -2px 4px rgba(255,255,255,0.8);
     }
     button {
-      padding: 0.75rem;
+      padding: 0.8rem;
       font-size: 1rem;
       background: #005efc;
       color: #fff;
@@ -72,7 +72,6 @@
       cursor: pointer;
       transition: background 0.2s ease-in-out;
       box-shadow: 3px 3px 10px rgba(0,94,252,0.2), -3px -3px 10px rgba(255,255,255,0.5);
-      margin-top: 0.5rem;
     }
     button:hover {
       background: #0041b3;
@@ -87,185 +86,41 @@
       <datalist id="teamsList"></datalist>
       <datalist id="nationsList"></datalist>
 
-      <!-- Row 1 -->
-      <div class="row">
-        <div>
-          <label for="player1">GK</label>
-          <input list="namesList" id="player1" name="player" placeholder="Type a name…" required>
-        </div>
-        <div>
-          <label for="team1">GK_Team</label>
-          <input list="teamsList" id="team1" name="team" placeholder="Type a team…" required>
-        </div>
-        <div>
-          <label for="nation1">GK_Nation</label>
-          <input list="nationsList" id="nation1" name="nation" placeholder="Type a nation…" required>
-        </div>
-      </div>
-
-      <!-- Row 2 -->
-      <div class="row">
-        <div>
-          <label for="player2">LB</label>
-          <input list="namesList" id="player2" name="player" placeholder="Type a name…" required>
-        </div>
-        <div>
-          <label for="team2">LB_Team</label>
-          <input list="teamsList" id="team2" name="team" placeholder="Type a team…" required>
-        </div>
-        <div>
-          <label for="nation2">LB_Nation</label>
-          <input list="nationsList" id="nation2" name="nation" placeholder="Type a nation…" required>
-        </div>
-      </div>
-
-      <!-- Row 3 -->
-      <div class="row">
-        <div>
-          <label for="player3">LCB</label>
-          <input list="namesList" id="player3" name="player" placeholder="Type a name…" required>
-        </div>
-        <div>
-          <label for="team3">LCB_Team</label>
-          <input list="teamsList" id="team3" name="team" placeholder="Type a team…" required>
-        </div>
-        <div>
-          <label for="nation3">LCB_Nation</label>
-          <input list="nationsList" id="nation3" name="nation" placeholder="Type a nation…" required>
-        </div>
-      </div>
-
-      <!-- Row 4 -->
-      <div class="row">
-        <div>
-          <label for="player4">RCB</label>
-          <input list="namesList" id="player4" name="player" placeholder="Type a name…" required>
-        </div>
-        <div>
-          <label for="team4">RCB_Team</label>
-          <input list="teamsList" id="team4" name="team" placeholder="Type a team…" required>
-        </div>
-        <div>
-          <label for="nation4">RCB_Nation</label>
-          <input list="nationsList" id="nation4" name="nation" placeholder="Type a nation…" required>
-        </div>
-      </div>
-
-      <!-- Row 5 -->
-      <div class="row">
-        <div>
-          <label for="player5">RB</label>
-          <input list="namesList" id="player5" name="player" placeholder="Type a name…" required>
-        </div>
-        <div>
-          <label for="team5">RB_Team</label>
-          <input list="teamsList" id="team5" name="team" placeholder="Type a team…" required>
-        </div>
-        <div>
-          <label for="nation5">RB_Nation</label>
-          <input list="nationsList" id="nation5" name="nation" placeholder="Type a nation…" required>
-        </div>
-      </div>
-
-      <!-- Row 6 -->
-      <div class="row">
-        <div>
-          <label for="player6">LM</label>
-          <input list="namesList" id="player6" name="player" placeholder="Type a name…" required>
-        </div>
-        <div>
-          <label for="team6">LM_Team</label>
-          <input list="teamsList" id="team6" name="team" placeholder="Type a team…" required>
-        </div>
-        <div>
-          <label for="nation6">LM_Nation</label>
-          <input list="nationsList" id="nation6" name="nation" placeholder="Type a nation…" required>
-        </div>
-      </div>
-
-      <!-- Row 7 -->
-      <div class="row">
-        <div>
-          <label for="player7">CM</label>
-          <input list="namesList" id="player7" name="player" placeholder="Type a name…" required>
-        </div>
-        <div>
-          <label for="team7">CM_Team</label>
-          <input list="teamsList" id="team7" name="team" placeholder="Type a team…" required>
-        </div>
-        <div>
-          <label for="nation7">CM_Nation</label>
-          <input list="nationsList" id="nation7" name="nation" placeholder="Type a nation…“ required>
-        </div>
-      </div>
-
-      <!-- Row 8 -->
-      <div class="row">
-        <div>
-          <label for="player8">CM</label>
-          <input list="namesList" id="player8" name="player" placeholder="Type a name…" required>
-        </div>
-        <div>
-          <label for="team8">CM_Team</label>
-          <input list="teamsList" id="team8" name="team" placeholder="Type a team…" required>
-        </div>
-        <div>
-          <label for="nation8">CM_Nation</label>
-          <input list="nationsList" id="nation8" name="nation" placeholder="Type a nation…" required>
-        </div>
-      </div>
-
-      <!-- Row 9 -->
-      <div class="row">
-        <div>
-          <label for="player9">RM</label>
-          <input list="namesList" id="player9" name="player" placeholder="Type a name…" required>
-        </div>
-        <div>
-          <label for="team9">RM_Team</label>
-          <input list="teamsList" id="team9" name="team" placeholder="Type a team…" required>
-        </div>
-        <div>
-          <label for="nation9">RM_Nation</label>
-          <input list="nationsList" id="nation9" name="nation" placeholder="Type a nation…" required>
-        </div>
-      </div>
-
-      <!-- Row 10 -->
-      <div class="row">
-        <div>
-          <label for="player10">ST</label>
-          <input list="namesList" id="player10" name="player" placeholder="Type a name…" required>
-        </div>
-        <div>
-          <label for="team10">ST_Team</label>
-          <input list="teamsList" id="team10" name="team" placeholder="Type a team…" required>
-        </div>
-        <div>
-          <label for="nation10">ST_Nation</label>
-          <input list="nationsList" id="nation10" name="nation" placeholder="Type a nation…" required>
-        </div>
-      </div>
-
-      <!-- Row 11 -->
-      <div class="row">
-        <div>
-          <label for="player11">ST</label>
-          <input list="namesList" id="player11" name="player" placeholder="Type a name…" required>
-        </div>
-        <div>
-          <label for="team11">ST_Team</label>
-          <input list="teamsList" id="team11" name="team" placeholder="Type a team…“ required>
-        </div>
-        <div>
-          <label for="nation11">ST_Nation</label>
-          <input list="nationsList" id="nation11" name="nation" placeholder="Type a nation…“ required>
-        </div>
-      </div>
+      <!-- inputs will be injected here -->
+      <div id="inputs"></div>
 
       <button type="submit">Generate &amp; Download .jsx</button>
     </form>
   </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const positions = ["GK","LB","LCB","RCB","RB","LM","CM","CM","RM","ST","ST"];
+      const inputsDiv = document.getElementById('inputs');
+
+      positions.forEach(pos => {
+        const row = document.createElement('div');
+        row.className = 'row';
+
+        ['player','team','nation'].forEach(type => {
+          const wrapper = document.createElement('div');
+          const label = document.createElement('label');
+          label.textContent = type === 'player'
+                            ? pos
+                            : `${pos}_${type.charAt(0).toUpperCase()+type.slice(1)}`;
+          const input = document.createElement('input');
+          input.setAttribute('list', type === 'player' ? 'namesList' : `${type}sList`);
+          input.name = type;
+          input.placeholder = `Type a ${type}…`;
+          input.required = true;
+
+          wrapper.append(label, input);
+          row.appendChild(wrapper);
+        });
+
+        inputsDiv.appendChild(row);
+      });
+    });
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
